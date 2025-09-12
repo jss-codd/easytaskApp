@@ -2,11 +2,10 @@ import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const BaseUrl = "https://api.easytaskers.com/api"
-// 'http://13.55.253.18:3002/api'
-// 'http://192.168.0.112:3001/api';
-// 'http://192.168.0.109:3001';
-// 'http://3.107.86.95:3002/api';
 
+export const ImageUrl = "https://easytaskers.s3.us-east-1.amazonaws.com"
+
+export const SocketUrl = "https://api.easytaskers.com"
 export const api = axios.create({
   baseURL: BaseUrl,
 });

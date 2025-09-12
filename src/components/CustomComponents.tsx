@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import styles from '../screens/task/bidDetails';
 
 export const InfoRow = ({
@@ -27,23 +27,23 @@ export const Section = ({
     <Text style={styles.textBold}>{title}</Text>
     {value ? <Text style={styles.textMuted}>{value}</Text> : children}
   </View>
-);  
+);
 
 export const Chip = ({ text }: { text: string }) => (
   <View style={styles.chip}>
-    <Text style={styles.chipIcon}>✔</Text>
+    {/* <Text style={styles.chipIcon}>✔</Text> */}
     <Text style={styles.chipText}>{text}</Text>
   </View>
 );
 
-const VerifiedBadge = () => (
+export const VerifiedBadge = () => (
   <View style={styles.verifiedRow}>
     <Text style={styles.verifiedIcon}>✔</Text>
     <Text style={styles.verifiedText}>Payment Verified</Text>
   </View>
 );
 
- export const Rating = ({ stars }: { stars: number }) => (
+export const Rating = ({ stars }: { stars: number }) => (
   <View style={styles.ratingRow}>
     {Array.from({ length: 5 }, (_, i) => (
       <Text key={i} style={i < stars ? styles.star : styles.starEmpty}>
@@ -51,4 +51,17 @@ const VerifiedBadge = () => (
       </Text>
     ))}
   </View>
+);
+
+export const Checkbox = ({ selected, onPress, disabled }: { selected: boolean; onPress: () => void; disabled?: boolean }) => (
+  <TouchableOpacity
+    style={styles.checkbox}
+    onPress={(e) => {
+      e.stopPropagation();
+      onPress();
+    }}
+    disabled={disabled}
+  >
+    {selected && <View style={styles.checkboxSelected} />}
+  </TouchableOpacity>
 );

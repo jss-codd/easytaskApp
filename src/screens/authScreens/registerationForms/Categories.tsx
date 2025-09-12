@@ -18,6 +18,7 @@ import { Category } from '../../../utils/type';
 import Colors from '../../../constants/color';
 import { useNavigation } from '@react-navigation/native';
 import { getSubCategories, setCategories } from '../../../service/apiService';
+import metrics from '../../../constants/metrics';
 
 const CategoriesForm = () => {
   const dispatch = useDispatch();
@@ -29,7 +30,7 @@ const CategoriesForm = () => {
   const [categoryItem, setCategoryItem] = useState<any>(null);
 
   const handleCategorySelect = async (selectedItem: any, index: number) => {
-    setCategoryItem(selectedItem); 
+    setCategoryItem(selectedItem);
   };
 
   useEffect(() => {
@@ -43,7 +44,7 @@ const CategoriesForm = () => {
   useEffect(() => {
     dispatch(fetchCategories() as any);
   }, [dispatch]);
-  
+
   const fetchSubCategories = async (selectedItem: any) => {
     console.log('selectedItem', selectedItem);
     const categoryId = categoryItem.value;
@@ -81,13 +82,9 @@ const CategoriesForm = () => {
 
     try {
       const response = await setCategories(payload);
-
-      if (response.success) {
-        Alert.alert('Success', 'Categories updated successfully!');
-        navigation.navigate('Home');
-      } else {
-        Alert.alert('Error', response.message || 'Something went wrong');
-      }
+      console.log(response);
+      Alert.alert('Success', 'Categories updated successfully!');
+      navigation.navigate('Home');
     } catch (error) {
       console.error('Error submitting categories:', error);
       Alert.alert('Error', 'Failed to update job preferences');
@@ -113,9 +110,9 @@ const CategoriesForm = () => {
         <View style={styles.container}>
           <View style={styles.backButtonContainer}>
             <Text style={styles.title}>Job Preferences</Text>
-            <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+            {/* <TouchableOpacity onPress={() => navigation.navigate('Login')}>
               <Text style={styles.backButton}>Skip</Text>
-            </TouchableOpacity>
+            </TouchableOpacity> */}
           </View>
 
           <Text style={styles.subtitle}>
@@ -166,38 +163,41 @@ const CategoriesForm = () => {
 
 export const styles = StyleSheet.create({
   container: {
+    borderRadius: metrics.borderRadius(10),
     flexGrow: 1,
     flex: 1,
-    padding: 20,
-    backgroundColor: '#fff',
-    paddingBottom: 50,
+    padding: metrics.padding(16),
+    backgroundColor: Colors.BACKGROUND,
+    paddingBottom: metrics.paddingBottom(50),
+    justifyContent: 'center',
   },
   title: {
     textAlign: 'center',
-    fontSize: 20,
+    fontSize: metrics.fontSize(20),
     fontWeight: 'bold',
-    marginBottom: 10,
+    marginBottom: metrics.marginBottom(10),
     color: Colors.DARK_GREY,
   },
   subtitle: {
-    fontSize: 16,
+    fontSize: metrics.fontSize(16),
     fontWeight: '400',
-    marginBottom: 10,
+    marginBottom: metrics.marginBottom(10),
   },
   errorText: {
     color: 'red',
-    fontSize: 14,
-    marginTop: 4,
+    fontSize: metrics.fontSize(14),
+    marginTop: metrics.marginTop(4),
   },
   button: {
     backgroundColor: Colors.BUTTON_BACKGROUND,
-    padding: 16,
-    borderRadius: 12,
-    marginTop: 20,
+    padding: metrics.padding(16),
+    borderRadius: metrics.borderRadius(12),
+    marginTop: metrics.marginTop(20),
+    paddingVertical: metrics.paddingVertical(10),
   },
   buttonText: {
     color: Colors.WHITE,
-    fontSize: 16,
+    fontSize: metrics.fontSize(16),
     fontWeight: 'bold',
     textAlign: 'center',
   },
@@ -207,7 +207,7 @@ export const styles = StyleSheet.create({
     alignItems: 'center',
   },
   backButton: {
-    fontSize: 16,
+    fontSize: metrics.fontSize(16),
     fontWeight: 'bold',
     textAlign: 'center',
     color: Colors.BUTTON_BACKGROUND,

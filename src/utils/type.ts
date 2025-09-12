@@ -9,7 +9,7 @@ export const Screen = {
   BidDetails: 'BidDetails',
   Profile: 'Profile',
   ForgotPassword: 'ForgotPassword',
-  SetPassword: 'SetPassword',
+  SetPassword: 'reset-password',
 };
 
 export interface User {
@@ -21,11 +21,15 @@ export interface User {
   phone: string,
   password?: string,
   confirmPassword?: string,
+  profile: {
+    rating: number,
+  },
 }
 
 export const stepFields: Record<number, string[]> = {
   0: ['title', 'description'],
-  1: [
+  1: ['mainCategory', 'categories'],
+  2: [
     'location.addressLine1',
     'location.addressLine2',
     'location.street',
@@ -35,8 +39,8 @@ export const stepFields: Record<number, string[]> = {
     'location.home',
     'location.state',
   ],
-  2: ['estimateBudget', 'deadline', 'note'],
-  3: ['image'],
+  3: ['estimateBudget', 'deadline', 'note'],
+  4: ['image'],
 };
 
 export type AxiosErrorMessage = {
@@ -47,17 +51,26 @@ export type AxiosErrorMessage = {
   };
 };
 
+export interface Message {
+  id?: string;
+  chatId: string;
+  text: string;
+  receiverId: string;
+  senderId: string;
+  role?: string;
+  createdAt?: string;
+  status?: string;
+}
 export interface Location {
   city: string;
   pincode?: string;
   phone?: string;
   state: string;
-  street: string;
-  country: string;
+  street?: string;
+  country?: string;
   addressLine1?: string;
   addressLine2?: string;
 }
-
 export interface Task {
   id: string;
   title: string;
@@ -87,6 +100,12 @@ export interface TaskResponse {
   data: Task[];
   meta: Meta;
 }
+export interface FileObject {
+  uri: string;
+  name: string | null;
+  type: string;
+  fileSize?: number;
+}
 
 export interface TaskPayload {
   title: string;
@@ -95,7 +114,7 @@ export interface TaskPayload {
   deadline: Date | string;
   note: string;
   location: Location;
-  image?: File | null;
+  media?: FileObject | null;
   categoryIds: string[];
   mainCategory: string;
   categories: string[];
@@ -112,6 +131,8 @@ export interface Bid {
     email: string;
     profile: { avatar: string | null };
   };
+  userId: string,
+  taskId: string,
   task: Task;
 }
 
@@ -124,14 +145,14 @@ export interface SubCategory {
   id: string;
   name: string;
   categoryId: string;
-  createdAt: string; 
-  updatedAt: string; 
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface Category {
   id: string;
   categoryName: string;
-  createdAt: string; 
-  updatedAt: string; 
+  createdAt: string;
+  updatedAt: string;
   subCategories: SubCategory[];
 }

@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useCallback, useEffect } from 'react';
 import { FlatList, Image, Text, TouchableOpacity, View } from 'react-native';
 import Header from '../layout/Header';
 import { useAppDispatch, useAppSelector } from '../../store/store';
@@ -8,12 +8,25 @@ import { fetchmyBids } from '../../store/slices/myBidSlice';
 import Loader from '../../components/Loader';
 import Colors from '../../constants/color';
 import { Bid } from '../../utils/type';
+import { useFocusEffect, useNavigation } from '@react-navigation/native';
+import { createChat } from '../../service/apiService';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const AllBids = () => {
   const dispatch = useAppDispatch();
+  const navigation = useNavigation<any>();
   const { user } = useAppSelector(state => state.authReducer);
   const { myBids, loading, error } = useAppSelector(
     state => state.myBidReducer,
+  );
+  console.log('myBids', myBids);
+
+  useFocusEffect(
+    useCallback(() => {
+      if (user?.id) {
+        dispatch(fetchmyBids(user.id));
+      }
+    }, [dispatch, user.id]),
   );
 
   useEffect(() => {
@@ -22,15 +35,47 @@ const AllBids = () => {
     }
   }, [user.id]);
 
+  const handleHirePress = async (item: any) => {
+    console.log(item);
+    const payload = {
+      bidId: item.id,
+      taskId: item.taskId,
+      taskerId: item.userId,
+      posterId: item.clientId,
+    };
+    console.log(payload);
+    try {
+      const response = await createChat({
+        bidId: item.id,
+        taskId: item.taskId,
+        taskerId: item.userId,
+        posterId: item.clientId,
+      });
+      console.log('chatId', response);
+      const chatId = response.id;
+      console.log('chatId', chatId);
+      navigation.navigate('Chat', {
+        userId: item.userId,
+        userName: 'Poster Name',
+        chatId: chatId,
+      });
+    } catch (error) {
+      console.log(error);
+      console.error('Error creating chat:', error);
+    }
+  };
+
   const renderItem = ({ item }: { item: Bid }) => (
     <View style={styles.card}>
       <View style={styles.userRow}>
-        {/* {item.user.profile.avatar ? ( */}
-          <Image
-            source={{ uri: `https://ui-avatars.com/api/?name=${item.user.name}&background=random` }}
-            style={styles.avatar}
-          />
-    
+
+        <Image
+          source={{
+            uri: `https://ui-avatars.com/api/?name=${item.user.name}&background=random`,
+          }}
+          style={styles.avatar}
+        />
+
         <View style={{ flex: 1 }}>
           <Text style={styles.userName}>{item.user.name}</Text>
           <Text style={styles.userEmail}>{item.user.email}</Text>
@@ -43,13 +88,10 @@ const AllBids = () => {
         Applied on : {new Date(item.task.createdAt).toDateString()}
       </Text>
 
-      {/* Transcript / Comment */}
-      {/* <Text style={styles.sectionTitle}>Transcript</Text> */}
       <Text style={styles.comment}>
         Status:{item.status || 'No transcript provided'}
       </Text>
 
-      {/* Quoted Price & Completion */}
       <View style={styles.footerRow}>
         <Text style={styles.footerText}>
           Quoted Price: {formatCurrency(item.offeredPrice)}
@@ -61,45 +103,51 @@ const AllBids = () => {
       <View style={styles.footerRow}>
         <TouchableOpacity
           style={styles.footerButton}
-          onPress={() => console.log('View Task Details')}
+          onPress={() => handleHirePress(item)}
         >
           <Text style={styles.footerBtnText}>Hire now</Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.footerButton}
-          onPress={() => console.log('View Task Details')}
+          onPress={() => navigation.navigate('Chat', {
+            userId: item.userId,
+            userName: item.user.name,
+            chatId: item.id,
+          })}
         >
-          <Text style={styles.footerBtnText}>Chat with trade </Text>
+          <Text style={styles.footerBtnText}>Chat with trade</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
 
   return (
-    <>
-      <Header title="My Bids" showBack={true} />
-      <View style={{ flex: 1, padding: 10, backgroundColor: '#f9f9f9' }}>
-        {loading ? (
-          <Loader fullScreen={true} color={Colors.MAIN_COLOR} />
-        ) : myBids?.length === 0 ? (
-          <View style={styles.emptyContainer}>
-            <Text>No Bids Found</Text>
-          </View>
-        ) : error !== null ? (
-          <View style={styles.emptyContainer}>
-            <Text>{error}</Text>
-          </View>
-        ) : (
-          <FlatList
-            data={myBids}
-            keyExtractor={item => item.id.toString()}
-            renderItem={renderItem}
-            contentContainerStyle={{ padding: 10 }}
-            showsVerticalScrollIndicator={false}
-          />
-        )}
-      </View>
-    </>
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1, }}>
+        <Header title="My Bids" />
+        <View style={{ flex: 1, padding: 10, backgroundColor: Colors.BACKGROUND }}>
+          {loading ? (
+            <Loader fullScreen={true} color={Colors.MAIN_COLOR} />
+          ) : myBids?.length === 0 ? (
+            <View style={styles.emptyContainer}>
+              <Text>No Bids Found</Text>
+            </View>
+          ) : error !== null ? (
+            <View style={styles.emptyContainer}>
+              <Text>{error}</Text>
+            </View>
+          ) : (
+            <FlatList
+              data={myBids}
+              keyExtractor={item => item.id.toString()}
+              renderItem={renderItem}
+              contentContainerStyle={{ padding: 10 }}
+              showsVerticalScrollIndicator={false}
+            />
+          )}
+        </View>
+      </SafeAreaView>
+    </SafeAreaProvider>
   );
 };
 

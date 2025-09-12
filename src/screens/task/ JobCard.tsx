@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import Colors from '../../constants/color';
 import LocationIcon from '../../Icons/LocationIcon';
-import LogoutIcon from '../../Icons/Logout';
-import JobIcon from '../../Icons/JobIcon';
-import { Location } from '../../utils/type';
-import { useNavigation } from '@react-navigation/native';
-import { createChat } from '../../service/apiService';
+import { Location, User } from '../../utils/type';
+import metrics from '../../constants/metrics';
+import { UnsaveIcon, SaveIcon } from '../../Icons/SaveIcon';
+import { Chip, Rating, VerifiedBadge } from '../../components/CustomComponents';
+import { getBidRange } from '../../utils/helper';
+import { UserRole } from '../../utils/enums';
 
 interface JobCardProps {
   title: string;
@@ -16,7 +17,13 @@ interface JobCardProps {
   paymentVerified: boolean;
   postedTime: string;
   onViewBids: () => void;
+  onSave: () => void;
   viewButtonText: string;
+  bidCount?: string;
+  owner?: User;
+  selectedCategories?: any;
+  isSaved?: boolean;
+  role?: string;
 }
 
 const JobCard: React.FC<JobCardProps> = ({
@@ -27,81 +34,99 @@ const JobCard: React.FC<JobCardProps> = ({
   paymentVerified,
   postedTime,
   onViewBids,
+  onSave,
   viewButtonText,
+  bidCount,
+  owner,
+  selectedCategories,
+  isSaved,
+  role,
 }) => {
-  const navigation = useNavigation<any>();
+  const [expanded, setExpanded] = useState(false);
 
-  const handleHirePress = async () => {
-    try {
-      const response = await createChat({
-        bidId: 'ebde2f62-d9cb-48c4-a7fc-6e4e22d9720e',
-        taskId: '65b2adf1-0154-45b3-aa57-0885f13b5399',
-        taskerId: 'cme70o6ux0001if6dlry049fd',
-        posterId: 'cme70ok1a0002if6dad2xw2vd',
-      });
+  const toggleDescription = () => setExpanded(prev => !prev);
 
-      const chatId = response.data.id;
+  const shouldShowButton = description.length > 150; 
 
-      navigation.navigate('Chat', {
-        userId: 'cme70ok1a0002if6dad2xw2vd',
-        userName: 'Poster Name',
-        chatId: chatId,
-      });
-    } catch (error) {
-      console.error('Error creating chat:', error);
-    }
-  };
   return (
-    <View style={styles.card}>
-      {/* <View style={styles.headerRow}>
-        <TouchableOpacity
-          style={{
-            backgroundColor: Colors.BUTTON_BACKGROUND,
-            padding: 10,
-            borderRadius: 10,
-          }}
-          onPress={handleHirePress}
-        >
-          <Text
-            style={{ color: Colors.WHITE, fontSize: 12, fontWeight: 'bold' }}
-          >
-            Hire{' '}
-          </Text>
-        </TouchableOpacity>
-      </View> */}
+    <TouchableOpacity style={styles.card} onPress={onViewBids}>
+      <View style={[styles.row, { justifyContent: 'space-between' }]}>
+        <Text style={styles.postedTime}>{`Posted ${postedTime}`}</Text>
+        {paymentVerified && (
+          <VerifiedBadge />
+          // <View style={styles.row}>     
+          //   <Text style={styles.verifiedIcon}>✔</Text>
+          //   <Text style={styles.verifiedText}> Payment Verified</Text>
+          // </View>
+        )}
+      </View>
 
       <View style={styles.headerRow}>
         <Text style={styles.title}>{title} </Text>
-        <Text style={styles.postedTime}>{postedTime}</Text>
-        {/* <JobIcon size={24} color="#27548a" /> */}
+        <Rating stars={owner?.profile.rating || 0} />
       </View>
 
-      <View style={styles.row}>
-        {paymentVerified && (
-          <View style={styles.row}>
-            {/* <Icon name="check-decagram" size={16} color="green" /> */}
-            <Text style={styles.verifiedText}> Payment Verified</Text>
-          </View>
-        )}
-        <View style={[styles.row, { marginLeft: 10 }]}>
-          <LocationIcon color="gray" size={15} />
+      <View style={[styles.row, { flex: 1 }]}>
+        <LocationIcon color="gray" size={15} />
+        <Text style={styles.locationText}>
+          {location.street}, {location.city}
+        </Text>
+      </View>
 
-          <Text style={styles.locationText}>
-            {location.street}, {location.city}
+      <View style={[styles.row]}>
+        <Text style={styles.budget}>
+          <Text style={{ fontWeight: '500' }}>Budget : {budget} </Text>
+        </Text>
+        <View style={styles.appliedBadge}>
+          <Text style={styles.appliedBadgeText}>
+            Bids: {getBidRange(Number(bidCount))}
           </Text>
         </View>
       </View>
+      <View
+        style={{
+          flexDirection: 'row',
+          flexWrap: 'wrap',
+          marginTop: metrics.marginTop(5),
+        }}
+      >
+        {selectedCategories?.map((category: any) => (
+          <React.Fragment key={category.id}>
+            <Chip text={category.name} />
 
-      <Text style={styles.budget}>
-        <Text style={{ fontWeight: 'bold' }}>Budget : {budget} </Text>
+            {category?.subCategories?.map((sub: any) => (
+              <Chip key={sub.id} text={sub.name} />
+            ))}
+          </React.Fragment>
+        ))}
+      </View>
+
+      {/* <Text style={styles.description} numberOfLines={expanded ? undefined : 3}>
+        {description}
       </Text>
 
-      <Text style={styles.description}>{description}</Text>
-
-      <TouchableOpacity style={styles.button} onPress={onViewBids}>
-        <Text style={styles.buttonText}>{viewButtonText}</Text>
-      </TouchableOpacity>
-    </View>
+      {shouldShowButton && (
+        <TouchableOpacity onPress={toggleDescription}>
+          <Text style={styles.showMore}>
+            {expanded ? 'Show Less' : 'Show More'}
+          </Text>
+        </TouchableOpacity>
+      )} */}
+      {role === UserRole.Tasker && (
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity style={styles.button} onPress={onViewBids}>
+          <Text style={styles.buttonText}>{viewButtonText}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton} onPress={onSave}>
+          {isSaved ? (
+            <SaveIcon size={22} color={Colors.MAIN_COLOR} />
+          ) : (
+            <UnsaveIcon size={22} color={Colors.MAIN_COLOR} />
+            )}
+          </TouchableOpacity>
+        </View>
+      )}
+    </TouchableOpacity>
   );
 };
 
@@ -110,67 +135,106 @@ export default JobCard;
 const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.CARD_BACKGROUND,
-    padding: 15,
-    borderRadius: 10,
-    marginVertical: 10,
-    elevation: 8,
-    shadowColor: '#27548a',
-    shadowOffset: { width: 0, height: 6 },
-    shadowOpacity: 0.13,
-    shadowRadius: 18,
+    padding: metrics.padding(15),
+    borderRadius: metrics.borderRadius(10),
+    marginBottom: metrics.marginBottom(10),
     position: 'relative',
-    borderWidth: 1,
-    borderColor: '#e3e8ee',
+    shadowColor: Colors.CHARCOAL_GRAY,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 3,
   },
   headerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
   },
   title: {
-    fontSize: 16,
+    fontSize: metrics.fontSize(16),
     fontWeight: 'bold',
     color: '#000',
     textTransform: 'capitalize',
+    flex: 1,
   },
   postedTime: {
-    color: '#1a73e8',
-    fontSize: 12,
+    color: Colors.LINK_COLOR,
+    fontSize: metrics.fontSize(11),
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 6,
+    marginTop: metrics.marginTop(6),
   },
   verifiedText: {
     color: 'green',
-    fontSize: 13,
+    fontSize: metrics.fontSize(11),
   },
   locationText: {
-    fontSize: 13,
-    color: '#555',
-    marginLeft: 3,
+    fontSize: metrics.fontSize(11),
+    color: Colors.DARK_GREY,
+    marginLeft: metrics.marginLeft(3),
     flexShrink: 1,
   },
   budget: {
-    marginTop: 6,
-    fontSize: 14,
-    color: '#000',
+    marginTop: metrics.marginTop(6),
+    fontSize: metrics.fontSize(11),
+    color: Colors.DARK_GREY,
   },
   description: {
-    marginTop: 6,
-    fontSize: 13,
-    color: '#777',
+    marginTop: metrics.marginTop(6),
+    fontSize: metrics.fontSize(11),
+    color: Colors.DARK_GREY,
+  },
+  showMore: {
+    marginTop: metrics.marginTop(4),
+    color: Colors.BUTTON_BACKGROUND,
+    fontSize: metrics.fontSize(11),
+    fontWeight: 'medium',
+    alignItems: 'flex-end',
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    gap: metrics.gap(15),
+  },
+  iconButton: {
+    backgroundColor: Colors.BACKGROUND,
+    padding: metrics.padding(5),
+    borderRadius: metrics.borderRadius(6),
+    alignItems: 'center',
+    marginTop: metrics.marginTop(12),
+    justifyContent: 'flex-end',
   },
   button: {
-    marginTop: 12,
-    backgroundColor: Colors.BUTTON_BACKGROUND,
-    paddingVertical: 10,
-    borderRadius: 6,
+    flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'center',
+    flex: 1,
+    marginTop: metrics.marginTop(12),
+    borderRadius: metrics.borderRadius(6),
+    backgroundColor: Colors.BUTTON_BACKGROUND,
   },
   buttonText: {
     color: '#fff',
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: metrics.fontSize(12),
+  },
+  appliedBadge: {
+    backgroundColor: Colors.LIGHT_GREY,
+    paddingHorizontal: metrics.paddingHorizontal(1),
+    paddingVertical: metrics.paddingVertical(2),
+    borderRadius: metrics.borderRadius(12),
+    // marginBottom: metrics.marginBottom(10),
+    alignItems: 'center',
+    width: metrics.width(70),
+    flexDirection: 'row',
+    justifyContent: 'center',
+    // flex: 1,
+  },
+  appliedBadgeText: {
+    textAlign: 'center',
+    flex: 1,
+    color: Colors.DARK_GREY,
+    fontWeight: '500',
+    fontSize: metrics.fontSize(11),
   },
 });

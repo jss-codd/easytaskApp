@@ -1,7 +1,7 @@
 export const postTaskValues = {
   title: '',
   description: '',
-  estimateBudget: '',
+  estimateBudget: 0,
   deadline: '',
   note: '',
   categoryIds:[],
@@ -9,14 +9,14 @@ export const postTaskValues = {
   location: {
     addressLine1: '',
     addressLine2: '',
-    pincode: '',
+    // pincode: '',
     street: '',
     state: '',
     city: '',
     country: 'India',
-    phone: '',
+    // phone: '',
   },
-  image: null,
+  media: null,
 };
 
 export const roles = [
@@ -69,6 +69,38 @@ export const stateOptions = [
   {label: 'Chandigarh', value: 'Chandigarh'},
   {label: 'Ladakh', value: 'Ladakh'},
 ];
+
+export const formatChatTime = (dateString?: string): string => {
+  if (!dateString) return '';
+
+  const date = new Date(dateString);
+  const now = new Date();
+
+  const isToday =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
+
+  const yesterday = new Date();
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear();
+
+  if (isToday) {
+    // show only time
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  }
+
+  if (isYesterday) {
+    return 'Yesterday';
+  }
+
+  // older → show date
+  return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+};
+
 
 export const validateEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -149,4 +181,15 @@ export const timeAgo = (dateString: string) => {
   const month = String(past.getMonth() + 1).padStart(2, '0');
   const year = past.getFullYear();
   return `${day}/${month}/${year}`;
+};
+
+export const getBidRange = (bidCount: number): string => {
+  if (bidCount <= 5) return '0-5';
+  if (bidCount <= 10) return '5-10';
+  if (bidCount <= 20) return '10+';
+  if (bidCount <= 50) return '20+';
+  if (bidCount <= 100) return '50+';
+  if (bidCount <= 200) return '100+';
+  if (bidCount <= 500) return '200+';
+  return '500+';
 };

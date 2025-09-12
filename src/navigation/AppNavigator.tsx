@@ -3,7 +3,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import AllJobs from '../screens/task/AllJobs';
 import BidDetails from '../screens/task/BidDetails';
-import Profile from '../screens/profile/Profile';
+import UpdateProfile from '../screens/profile/UpdateProfile';
 import UserIcon from '../Icons/UserIcon';
 import HomeIcon from '../Icons/HomeIcon';
 import JobIcon from '../Icons/JobIcon';
@@ -14,14 +14,14 @@ import ChatList from '../screens/chat/ChatList';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import Colors from '../constants/color';
 import DrawerView from '../components/DrawerView';
-import {
-  Dimensions,
-  TouchableOpacity,
-  useWindowDimensions,
-} from 'react-native';
+import { Dimensions, TouchableOpacity } from 'react-native';
 import MenuIcon from '../Icons/MenuIcon';
 import StepperForm from '../screens/task/CreateTask';
 import CategoriesForm from '../screens/authScreens/registerationForms/Categories';
+import ChangePassword from '../screens/profile/ChangePassword';
+import ChangeLocation from '../screens/profile/ChangeLocation';
+import Profile from '../screens/profile/Profile';
+import SavedTask from '../screens/task/SavedTask';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -34,9 +34,9 @@ export type ChatStackParamList = {
     userId: string;
     userName: string;
     chatId: string;
+    recieverId: string;
   };
 };
-
 
 export const JobsStack = () => (
   <Stack.Navigator>
@@ -74,20 +74,19 @@ export const JobsStack = () => (
 export const ChatListStack = () => (
   <Stack.Navigator initialRouteName="ChatList">
     <ChatStack.Screen
+      name="Chat"
+      component={ChatScreen}
+      options={({ route }) => ({ title: route.params.userName, headerShown: false })}
+    />
+    <ChatStack.Screen
       name="ChatList"
       component={ChatList}
       options={{ title: 'Chats', headerShown: false }}
-    />
-    <ChatStack.Screen
-      name="Chat"
-      component={ChatScreen}
-      options={({ route }) => ({ title: route.params.userName })}
     />
   </Stack.Navigator>
 );
 
 export const ProfileDrawer = () => {
-  const dimensions = useWindowDimensions();
   return (
     <Drawer.Navigator
       drawerContent={props => <DrawerView {...props} />}
@@ -96,14 +95,23 @@ export const ProfileDrawer = () => {
         headerTitleStyle: {
           fontSize: 20,
           fontWeight: 'bold',
-          color: Colors.MAIN_COLOR,
+          color: Colors.WHITE,
         },
-        headerTintColor: Colors.GREY,
+        headerTintColor: Colors.WHITE,
+        headerStyle: {
+          backgroundColor: Colors.MAIN_COLOR,
+        },
+        headerTitleAlign: 'center',
         drawerStyle: {
-          width: Dimensions.get('screen').width,
-          backgroundColor: Colors.WHITE,
-          borderRadius: 50,
-          // borderBottomEndRadius: 30,
+          width: Dimensions.get('screen').width * 0.8,
+          backgroundColor: Colors.BACKGROUND,
+          borderTopLeftRadius: 25,
+          borderBottomLeftRadius: 25,
+          shadowColor: Colors.MAIN_COLOR,
+          shadowOffset: { width: 0, height: 2 },
+          shadowOpacity: 0.25,
+          shadowRadius: 3.84,
+          elevation: 5,
         },
         drawerType: 'front',
         drawerPosition: 'right',
@@ -113,14 +121,17 @@ export const ProfileDrawer = () => {
             onPress={() => navigation.toggleDrawer()}
             style={{ marginRight: 15 }}
           >
-            <MenuIcon color="#27548a" />
+            <MenuIcon color={Colors.WHITE} />
           </TouchableOpacity>
         ),
       })}
     >
-      <Drawer.Screen name="ProfileHome" component={Profile} />
+      <Drawer.Screen name="Profile" component={Profile} />
+      <Drawer.Screen name="UpdateProfile" component={UpdateProfile} />
       <Drawer.Screen name="Categories" component={CategoriesForm} />
-    
+      <Drawer.Screen name="ChangePassword" component={ChangePassword} />
+      <Drawer.Screen name="ChangeLocation" component={ChangeLocation} />
+      <Drawer.Screen name="SavedTask" component={SavedTask} />
     </Drawer.Navigator>
   );
 };
@@ -146,12 +157,10 @@ const AppNavigator = () => {
         tabBarInactiveTintColor: 'gray',
       })}
     >
-
       <Tab.Screen name="Home" component={JobsStack} />
       <Tab.Screen name="Bids" component={AllBids} />
       <Tab.Screen name="Chat" component={ChatListStack} />
       <Tab.Screen name="Profile" component={ProfileDrawer} />
-    
     </Tab.Navigator>
   );
 };

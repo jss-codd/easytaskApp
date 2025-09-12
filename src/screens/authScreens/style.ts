@@ -4,17 +4,24 @@ import Colors from '../../constants/color';
 
 export const loginStyles = StyleSheet.create({
   container: {
-    flexGrow: 1,
+    flex: 1,
     padding: metrics.padding(20),
-    backgroundColor: '#f8f9fa',
+    backgroundColor: Colors.BACKGROUND,
+    justifyContent: 'center',
+  },
+  formContainer: {
+ 
+    paddingHorizontal: metrics.padding(20),
+    paddingVertical: metrics.padding(40),
     justifyContent: 'center',
   },
   loginButton: {
-    backgroundColor: "#007AFF",
+    marginTop: metrics.marginTop(15),
+    backgroundColor:Colors.BUTTON_BACKGROUND,
     borderRadius: metrics.borderRadius(12),
     paddingVertical: metrics.padding(16),
     alignItems: 'center',
-    shadowColor: '#007AFF',
+    shadowColor: Colors.BUTTON_BACKGROUND,
     shadowOffset: {
       width: 0,
       height: 4,
@@ -22,6 +29,15 @@ export const loginStyles = StyleSheet.create({
     shadowOpacity: 0.3,
     shadowRadius: 8,
     elevation: 8,
+  },
+  showPasswordButton: {
+    paddingHorizontal: metrics.padding(16),
+    paddingVertical: metrics.padding(12),
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  showPasswordText: {
+    fontSize: metrics.fontSize(20)
   },
   loginButtonText: {
     color: '#fff',

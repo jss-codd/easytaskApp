@@ -7,11 +7,16 @@ import {
   Platform,
   ScrollView,
   Text,
+  TouchableOpacity,
   TouchableWithoutFeedback,
+  View,
 } from 'react-native';
 import FormStyles from './taskForm';
-import { formatDate } from '../../../utils/helper';
+import { formatDate, goNextStep } from '../../../utils/helper';
 import FileInput from '../../../components/FileInput';
+import { stepFields } from '../../../utils/type';
+import Colors from '../../../constants/color';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 
 const BudgetDetails = ({
   values,
@@ -19,6 +24,10 @@ const BudgetDetails = ({
   setFieldValue,
   errors,
   touched,
+  step,
+  setStep,
+  validateForm,
+  setFieldTouched,
 }: any) => {
   const [showDatePicker, setShowDatePicker] = useState(false);
   const handleDateChange = (event: any, selectedDate?: Date) => {
@@ -41,15 +50,23 @@ const BudgetDetails = ({
         >
           <Text style={FormStyles.title}>Budget Details</Text>
           <CustomInput
-            label="Estimate Budget"
+            label={
+              <Text>
+                Estimate Budget<Text style={{color: 'red'}}>*</Text>
+              </Text>
+            }
             placeholder="Estimate Budget"
-            value={values.estimateBudget}
+            value={String(values.estimateBudget)}
             keyboardType="numeric"
             onChangeText={handleChange('estimateBudget')}
             error={touched.estimateBudget && errors.estimateBudget}
           />
           <CustomInput
-            label="Deadline"
+            label={
+              <Text>
+                Deadline<Text style={{color: 'red'}}>*</Text>
+              </Text>
+            }
             placeholder="Deadline"
             value={values.deadline}
             onChangeText={handleChange('deadline')}
@@ -63,7 +80,7 @@ const BudgetDetails = ({
               value={values.deadline ? new Date(values.deadline) : new Date()}
               mode="date"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-              maximumDate={new Date()}
+
               onChange={handleDateChange}
             />
           )}
@@ -75,20 +92,53 @@ const BudgetDetails = ({
             multiline
             numberOfLines={10}
             textInputContainerStyle={{ height: 100 }}
-            // error={touched.note && errors.note}
+          // error={touched.note && errors.note}
           />
-          <FileInput
+          {/* <FileInput
             label="Task Image"
             placeholder="Task Image"
-            value={values.image}
-            onSelectFile={(file: any) => setFieldValue('image', file)}
+            value={values.media}
+            onSelectFile={(file: any) => setFieldValue('media', file)}
+          /> */}
+          <FileInput
+            label="Task Files"
+            placeholder="images/docs"
+            allowMultiSelection={true}
+            value={values.media} 
+            onSelectFile={(files: any[]) => setFieldValue('media', files)}
           />
+
           {/* {errors.laSelfieUpload && touched.laSelfieUpload && (
           <Text style={FormStyles.error}>{errors.laSelfieUpload}</Text>
         )} */}
+          <View style={FormStyles.row}>
+            {step > 0 && (
+              <TouchableOpacity
+                style={FormStyles.button}
+                onPress={() => setStep(step - 1)}
+              >
+                <Text style={FormStyles.buttonText}>Back</Text>
+              </TouchableOpacity>
+            )}
+            <TouchableOpacity
+              style={FormStyles.button}
+              onPress={() =>
+                goNextStep(
+                  step,
+                  setStep,
+                  stepFields,
+                  validateForm,
+                  setFieldTouched,
+                )
+              }
+            >
+              <Text style={FormStyles.buttonText}>Next</Text>
+            </TouchableOpacity>
+          </View>
         </ScrollView>
       </TouchableWithoutFeedback>
     </KeyboardAvoidingView>
+
   );
 };
 

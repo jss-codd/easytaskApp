@@ -1,11 +1,18 @@
-import React, { useRef } from 'react';
-import { View, Text, TextInput, StyleSheet } from 'react-native';
+import React, { useRef, useState } from 'react';
+import { View, Text, TextInput, StyleSheet, TouchableOpacity, ActivityIndicator, Alert } from 'react-native';
+import metrics from '../../../constants/metrics';
+import Colors from '../../../constants/color';
+import { Toast } from '../../../components/CommonToast';
+import axios from 'axios';
+import { resendVerification } from '../../../service/apiService';
 
 interface Props {
   values: any;
   errors: any;
   touched: any;
   setFieldValue: (field: string, value: any) => void;
+  handleSubmitForm: (values: any, resetForm: any) => void;
+  resetForm: any;
 }
 
 const Verification: React.FC<Props> = ({
@@ -13,9 +20,41 @@ const Verification: React.FC<Props> = ({
   errors,
   touched,
   setFieldValue,
+  handleSubmitForm,
+  resetForm,
 }) => {
+  const [resending, setResending] = useState(false);
   const inputs = useRef<any[]>([]);
+  console.log('values', values.email);
 
+  const handleResendOtp = async () => {
+    try {
+      setResending(true);
+
+      const response = await resendVerification(
+        { email: values.email }
+      );
+
+      console.log('Resend OTP response:', response);
+
+      Toast.show({
+        type: 'success',
+        text1: response.message || 'OTP resent successfully',
+      });
+    } catch (err: any) {
+      console.error('Resend OTP error:', err.response?.data?.message);
+
+      const errorMessage =
+        err.response?.data?.message || 'Failed to resend OTP. Please try again.';
+
+      Toast.show({
+        type: 'error',
+        text1: errorMessage,
+      });
+    } finally {
+      setResending(false);
+    }
+  };
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Verify Your Account</Text>
@@ -23,14 +62,14 @@ const Verification: React.FC<Props> = ({
         Enter the 4-digit code sent to your email
       </Text>
       <View style={styles.otpBoxContainer}>
-        {Array.from({ length: 4 }).map((_, index) => (
+        {/* {Array.from({ length: 4 }).map((_, index) => (
           <TextInput
             key={index}
             style={[
               styles.otpBox,
               errors.otp && touched.otp && styles.inputError,
             ]}
-            value={values.otp[index] || ''} 
+            value={values.otp[index] || ''}
             keyboardType="numeric"
             maxLength={1}
             onChangeText={text => {
@@ -39,19 +78,73 @@ const Verification: React.FC<Props> = ({
               const updatedOtp = otpArray.join('');
               setFieldValue('otp', updatedOtp);
               console.log('Updated OTP:', updatedOtp);
-            
+
               if (text && index < 3) {
                 inputs.current[index + 1].focus();
               }
             }}
             ref={(ref: any) => (inputs.current[index] = ref)}
           />
+        ))} */}
+        {Array.from({ length: 4 }).map((_, index) => (
+          <TextInput
+            key={index}
+            style={[
+              styles.otpBox,
+              errors.otp && touched.otp && styles.inputError,
+            ]}
+            value={values.otp[index] || ''}
+            keyboardType="numeric"
+            maxLength={1}
+            onChangeText={text => {
+              const otpArray = values.otp.split('');
+              otpArray[index] = text;
+              const updatedOtp = otpArray.join('');
+              setFieldValue('otp', updatedOtp);
+
+              if (text && index < 3) {
+                inputs.current[index + 1].focus(); 
+              }
+            }}
+            onKeyPress={({ nativeEvent }) => {
+              if (
+                nativeEvent.key === 'Backspace' &&
+                !values.otp[index] && 
+                index > 0
+              ) {
+                inputs.current[index - 1].focus(); 
+              }
+            }}
+            ref={(ref: any) => (inputs.current[index] = ref)}
+          />
         ))}
+
       </View>
 
       {errors.otp && touched.otp && (
         <Text style={styles.errorText}>{errors.otp}</Text>
       )}
+
+      <View style={styles.buttonContainer}>
+        <TouchableOpacity
+          style={styles.resendButton}
+          onPress={handleResendOtp}
+          disabled={resending}
+        >
+          {resending ? (
+            <ActivityIndicator color="#fff" />
+          ) : (
+            <Text style={styles.buttonText}>Resend OTP</Text>
+          )}
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.submitButton}
+          onPress={() => handleSubmitForm(values, resetForm)}
+        >
+          <Text style={styles.buttonText}>Submit</Text>
+        </TouchableOpacity>
+      </View>
+
     </View>
   );
 };
@@ -98,4 +191,38 @@ const styles = StyleSheet.create({
     fontSize: 14,
     marginTop: 10,
   },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: metrics.marginTop(40),
+    marginBottom: metrics.marginBottom(40),
+    gap: metrics.gap(10),
+  },
+
+  submitButton: {
+    flex: 1,
+    backgroundColor: Colors.BUTTON_BACKGROUND,
+    paddingVertical: metrics.paddingVertical(15),
+    borderRadius: metrics.borderRadius(12),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  resendButton: {
+    flex: 1,
+    backgroundColor: Colors.GREY,
+    paddingVertical: metrics.paddingVertical(15),
+    borderRadius: metrics.borderRadius(12),
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+
+  buttonText: {
+    color: '#fff',
+    fontSize: metrics.fontSize(14),
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+
+
 });

@@ -1,9 +1,11 @@
 import React from 'react';
+import { StyleProp } from 'react-native';
+import { ViewStyle } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 
-const LocationIcon = ({ size = 20, color = 'black' }) => {
+const LocationIcon = ({ size = 20, color = 'black' ,style}: { size?: number, color?: string, style?: StyleProp<ViewStyle> }) => {
   return (
-    <Svg width={size} height={size} fill="none" viewBox="0 0 24 24">
+    <Svg width={size} height={size} fill="none" viewBox="0 0 24 24" style={style} >
       <Path
         stroke={color}
         stroke-linecap="round"

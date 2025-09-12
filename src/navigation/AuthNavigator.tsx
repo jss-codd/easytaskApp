@@ -5,6 +5,8 @@ import Register from '../screens/authScreens/Register';
 import Home from '../screens/home/Home.tsx';
 import { Screen } from '../utils/type.ts';
 import CategoriesForm from '../screens/authScreens/registerationForms/Categories.tsx';
+import ForgotPassword from '../screens/authScreens/ForgotPasswordScreen.tsx';
+import SetPassword from '../screens/authScreens/SetPassword.tsx';
 
 const AuthNavigator = () => {
   const Stack = createStackNavigator();
@@ -15,12 +17,22 @@ const AuthNavigator = () => {
         component={Login}
         options={{ headerShown: false }}
       />
-
+       <Stack.Screen
+        name={Screen.SetPassword}
+        component={SetPassword}
+        options={{ headerShown: false }}
+      />
       <Stack.Screen
         name={Screen.Register}
         component={Register}
         options={{ headerShown: false }}
       />
+      <Stack.Screen
+        name={Screen.ForgotPassword}
+        component={ForgotPassword}
+        options={{ headerShown: false }}
+      />
+     
       <Stack.Screen
         name="Categories"
         component={CategoriesForm}

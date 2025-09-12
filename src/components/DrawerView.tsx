@@ -1,16 +1,16 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
   DrawerItem,
 } from '@react-navigation/drawer';
-
 import { useSelector } from 'react-redux';
 import { logout } from '../store/slices/authSlice';
 import { RootState, useAppDispatch } from '../store/store';
-import { Screen } from '../utils/type';
 import Colors from '../constants/color';
+import { UserRole } from '../utils/enums';
+import metrics from '../constants/metrics';
 
 const Loader = ({
   isVisible,
@@ -77,40 +77,60 @@ const DrawerView: React.FC<DrawerContentComponentProps> = props => {
           <Text style={styles.nameText} numberOfLines={1}>
             Easy Task
           </Text>
-          {/* <Text style={styles.emailText} numberOfLines={1}>
-            Name: {'User'}
-          </Text>
-          <Text style={styles.roleText} numberOfLines={1}>
-            Role:
-          </Text> */}
+
         </View>
       </View>
 
       {/* <View style={styles.divider} /> */}
 
       <View style={styles.menu}>
+        {user.role === UserRole.Tasker ? (
+          <DrawerItem
+            label="Add Category"
+            // icon={() => (
+            //   <Icon name="view-dashboard-outline" size={28} color={Colors.GREY} />
+            // )}
+            labelStyle={styles.label}
+            onPress={() => props.navigation.navigate('Categories')}
+            style={
+              isActive('Categories')
+                ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
+                : {}
+            }
+          />
+        ) : (
+          <></>
+        )}
         <DrawerItem
-          label="Add Category"
-          // icon={() => (
-          //   <Icon name="view-dashboard-outline" size={28} color={Colors.GREY} />
-          // )}
+          label="Edit Profile"
+          onPress={() => props.navigation.navigate('UpdateProfile')}
           labelStyle={styles.label}
-          onPress={() => props.navigation.navigate("Categories")}
           style={
-            isActive("Categories")
+            isActive('UpdateProfile')
               ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
               : {}
           }
         />
-          <DrawerItem
-          label="Post Task"
+        <DrawerItem
+          label="Saved Task"
+          onPress={() => props.navigation.navigate('SavedTask')}
+          labelStyle={styles.label}
+          style={
+            isActive('SavedTask')
+              ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
+              : {}
+          }
+        />
+
+        <DrawerItem
+          label="Change Password"
           // icon={() => (
           //   <Icon name="view-dashboard-outline" size={28} color={Colors.GREY} />
           // )}
           labelStyle={styles.label}
-          onPress={() => props.navigation.navigate("PostTask")}
+          onPress={() => props.navigation.navigate('ChangePassword')}
           style={
-            isActive("PostTask")
+            isActive('ChangePassword')
               ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
               : {}
           }
@@ -131,81 +151,74 @@ const DrawerView: React.FC<DrawerContentComponentProps> = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: Colors.BACKGROUND,
-    // borderRadius: 15,
   },
   header: {
     alignItems: 'center',
-    marginTop: 30,
+    marginTop: metrics.margin(30),
   },
-  profileImage: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-  },
+
   userInfo: {
-    marginTop: 25,
+    marginTop: metrics.margin(25),
     alignItems: 'center',
   },
   nameText: {
-    fontSize: 18,
+    fontSize: metrics.fontSize(18),
     color: Colors.MAIN_COLOR,
     fontWeight: '700',
     textTransform: 'capitalize',
   },
   emailText: {
-    fontSize: 12,
+    fontSize: metrics.fontSize(12),
     fontWeight: '700',
     color: 'black',
-    marginTop: 4,
+    marginTop: metrics.marginTop(4),
     textTransform: 'capitalize',
   },
   roleText: {
-    fontSize: 10,
+    fontSize: metrics.fontSize(10),
     fontWeight: '700',
     color: Colors.GREY,
-    marginTop: 4,
+    marginTop: metrics.marginTop(4) ,
     textTransform: 'capitalize',
   },
   divider: {
     borderBottomColor: '#444',
-    borderBottomWidth: 1,
-    marginVertical: 20,
-    marginHorizontal: 30,
+    borderBottomWidth: metrics.borderWidth(1),
+    marginVertical: metrics.marginVertical(20),
+    marginHorizontal: metrics.marginHorizontal(30),
   },
   menu: {
-    paddingHorizontal: 10,
-    // color: Colors.MAIN_COLOR,
+    paddingHorizontal: metrics.paddingHorizontal(10),
   },
   label: {
-    fontSize: 16,
+    fontSize: metrics.fontSize(14),
     fontWeight: '600',
     color: Colors.MAIN_COLOR,
   },
   logoutSection: {
     marginTop: 'auto',
-    paddingHorizontal: 20,
-    marginBottom: 20,
+    paddingHorizontal: metrics.paddingHorizontal(20),
+    marginBottom: metrics.marginBottom(20),
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: 15,
+    marginTop: metrics.marginTop(15),
   },
   logoutText: {
     color: Colors.MAIN_COLOR,
-    fontSize: 18,
+    fontSize: metrics.fontSize(18),
     fontWeight: '600',
-    marginLeft: 10,
+    marginLeft: metrics.marginLeft(10),
   },
   closeButton: {
     position: 'absolute',
-    right: 20,
-    top: 10,
+    right: metrics.right(20),
+    top: metrics.top(10),
     zIndex: 10,
   },
   closeText: {
-    fontSize: 15,
+    fontSize: metrics.fontSize(15),
     color: Colors.MAIN_COLOR,
     fontWeight: 'bold',
   },

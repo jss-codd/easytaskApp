@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "660190356809",
+    "project_id": "pushnotification-3750f",
+    "storage_bucket": "pushnotification-3750f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:660190356809:android:026888829e3c34b70fa698",
+        "android_client_info": {
+          "package_name": "com.easytask"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA6nY-8gbP1sgnv0Fast80tvrEhxjTB740"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

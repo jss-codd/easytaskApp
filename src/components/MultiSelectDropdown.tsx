@@ -57,7 +57,6 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   return (
     <TouchableWithoutFeedback onPress={() => setOpen(false)}>
       <View>
-        {/* Button */}
         <TouchableOpacity
           style={[styles.dropdownButtonStyle, buttonStyle]}
           onPress={e => {
@@ -118,8 +117,6 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
             )}
           </ScrollView>
         )}
-
-        {/* Tags */}
       </View>
     </TouchableWithoutFeedback>
   );
@@ -131,15 +128,15 @@ const styles = StyleSheet.create({
   dropdownButtonStyle: {
     flexDirection:'row',
     width: '100%',
-    height: 56,
+    height: metrics.height(56),
     backgroundColor: Colors.WHITE,
-    borderRadius: 12,
+    borderRadius: metrics.borderRadius(12),
     justifyContent: 'space-between',
     alignItems:'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: metrics.paddingHorizontal(16),
     borderWidth: 1,
     borderColor: '#DDD',
-    marginBottom: 8,
+    marginBottom: metrics.marginBottom(8),
   },
   dropdownButtonTxtStyle: {
     fontSize: metrics.fontSize(13),
@@ -148,87 +145,59 @@ const styles = StyleSheet.create({
 
   },
   dropdownMenuStyle: {
-    backgroundColor: '#FFF',
-    borderRadius: 8,
+    backgroundColor: Colors.WHITE,
+    borderRadius: metrics.borderRadius(8),
     maxHeight: 200,
-    marginTop: 8,
+    marginTop: metrics.marginTop(8),
     borderWidth: 1,
     borderColor: '#DDD',
-    paddingVertical: 8,
+    paddingVertical: metrics.paddingVertical(8),
     elevation: 3,
   },
   dropdownItemStyle: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingHorizontal: metrics.paddingHorizontal(16),
+    paddingVertical: metrics.paddingVertical(12),
   },
   dropdownItemTxtStyle: {
-    fontSize: 14,
+    fontSize: metrics.fontSize(14),
     color: '#000',
   },
   tagsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 10,
-    gap: 8,
+    // marginTop: metrics.marginTop(5),
+    gap: metrics.gap(1),
   },
   tag: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#E9ECEF',
-    paddingVertical: 6,
-    paddingHorizontal: 10,
-    borderRadius: 16,
-    marginRight: 6,
-    marginBottom: 6,
+    backgroundColor: Colors.LIGHT_BLUE,
+    paddingVertical: metrics.paddingVertical(5),
+    paddingHorizontal: metrics.paddingHorizontal(10),
+    borderRadius: metrics.borderRadius(16),
+    marginRight: metrics.marginRight(5),
+    marginBottom: metrics.marginBottom(5),
   },
   tagText: {
-    fontSize: 14,
-    color: '#333',
-    marginRight: 6,
+    fontSize: metrics.fontSize(14),
+    color: Colors.LINK_COLOR,
+    marginRight: metrics.marginRight(5),
   },
   removeIcon: {
     color: '#999',
-    fontSize: 16,
+    fontSize: metrics.fontSize(12),
     fontWeight: 'bold',
   },
   noDataContainer: {
-    padding: 16,
+    padding: metrics.padding(16),
     alignItems: 'center',
   },
   noDataText: {
-    fontSize: 14,
+    fontSize: metrics.fontSize(14),
     color: '#999',
   },
 });
 
-// {open && (
-//   <ScrollView
-//     style={[styles.dropdownMenuStyle, menuStyle]}
-//     nestedScrollEnabled
-//   >
-//     {data.map((item, index) => {
-//       const isSelected = selectedValues.includes(item.value);
-//       return (
-//         <TouchableOpacity
-//           key={index}
-//           style={[
-//             styles.dropdownItemStyle,
-//             isSelected && { backgroundColor: '#D2D9DF' },
-//           ]}
-//           onPress={e => {
-//             e.stopPropagation();
-//             toggleSelection(item);
-//           }}
-//         >
-//           <Text style={styles.dropdownItemTxtStyle}>{item.label}</Text>
-//           {/* {isSelected && (
-//             <Text style={{ color: 'green', fontWeight: 'bold' }}>✓</Text>
-//           )} */}
-//         </TouchableOpacity>
-//       );
-//     })}
-//   </ScrollView>
-// )}

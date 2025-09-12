@@ -1,9 +1,11 @@
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import {api} from '../../service/axiosInterceptor.ts';
+import { getUserProfile, updateUserRole } from '../../service/apiService.ts';
 
 interface AuthState {
   user: any | null;
+  profile: any | null;
   signupUser: any | null;
   token: string | null;
   loading: boolean;
@@ -13,6 +15,7 @@ interface AuthState {
 
 const initialState: AuthState = {
   signupUser: null,
+  profile: null,
   user: null,
   token: null,
   loading: false,
@@ -54,17 +57,29 @@ export const signupUser = createAsyncThunk(
   },
 );
 
-// export const verifyEmail = createAsyncThunk(
+export const getProfile = createAsyncThunk(
+  'auth/getProfile',
+  async (_, {rejectWithValue}: any) => {
+    try {
+      const response = await getUserProfile();
+      return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Profile fetch failed');
+    }
+  },
+);
 
-//   async (payload: any, {rejectWithValue}: any) => {
-//     try {
-//       const response = await api.post('http://192.168.0.109:3001/api/auth/verify', payload);
-//       return response.data;
-//     } catch (error: any) {
-//       return rejectWithValue(error.response?.data?.message || 'Verify email failed');
-//     }
-//   },
-// );
+export const updateRole = createAsyncThunk(
+  'auth/updateRole',
+  async (role: string, {rejectWithValue}: any) => {
+    try {
+      const response = await updateUserRole(role);
+      return { role, user: response };
+    } catch (error: any) {
+      return rejectWithValue(error.response?.data?.message || 'Role update failed');
+    }
+  },
+);
 
 export const logoutUser = createAsyncThunk('auth/logout', async () => {
   await AsyncStorage.removeItem('token');
@@ -96,6 +111,9 @@ export const authSlice = createSlice({
     signupSuccess: (state, action) => {
       state.signupUser = action.payload;
     },
+    getProfileSuccess: (state, action) => {
+      state.profile = action.payload;
+    },
   },
   extraReducers: builder => {
     builder
@@ -122,6 +140,27 @@ export const authSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         state.error = null;
+      })
+      .addCase(getProfile.fulfilled, (state, action) => {
+        state.profile = action.payload;
+      })
+      .addCase(updateRole.pending, state => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(updateRole.fulfilled, (state, action) => {
+        state.loading = false;
+        if (state.profile) {
+          state.profile.role = action.payload.role;
+        }
+        if (state.user) {
+          state.user.role = action.payload.role;
+        }
+        state.error = null;
+      })
+      .addCase(updateRole.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload as string;
       });
   },
 });

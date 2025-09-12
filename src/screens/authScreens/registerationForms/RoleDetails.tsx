@@ -4,8 +4,9 @@ import Colors from '../../../constants/color';
 import { loginStyles } from '../style';
 import { useNavigation } from '@react-navigation/native';
 import { roles } from '../../../utils/helper';
+import metrics from '../../../constants/metrics';
 
-const RoleDetails = ({ values, errors, touched, handleChange }: any) => {
+const RoleDetails = ({ values, errors, touched, handleChange, step, goNext, goBack, loading }: any) => {
   const navigation = useNavigation<any>();
   return (
     <View style={styles.container}>
@@ -45,11 +46,23 @@ const RoleDetails = ({ values, errors, touched, handleChange }: any) => {
         <Text style={styles.errorText}>{errors.role}</Text>
       )}
 
-<View style={loginStyles.footer}>
+
+      <View style={loginStyles.footer}>
         <Text style={loginStyles.footerText}>Already have an account? </Text>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
           <Text style={loginStyles.signupLink}>Login</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.buttonContainer}>
+        {step===0 && (
+        <TouchableOpacity
+          style={styles.nextButton}
+          onPress={goNext}
+        >
+            <Text style={styles.buttonText}>Next</Text>
+          </TouchableOpacity>
+        )}
       </View>
     </View>
   );
@@ -115,6 +128,40 @@ const styles = StyleSheet.create({
     color: '#EF4444',
     fontSize: 14,
     marginTop: 12,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: metrics.marginTop(20),
+    marginBottom: metrics.marginBottom(60),
+    gap: metrics.gap(15),
+    backgroundColor: Colors.BACKGROUND,
+  },
+  backButton: {
+    flex: 1,
+    backgroundColor: Colors.GREY,
+    padding: metrics.padding(10),
+    borderRadius: metrics.borderRadius(12),
+    alignItems: 'center',
+  },
+  nextButton: {
+    flex: 1,
+    backgroundColor: Colors.BUTTON_BACKGROUND,
+    padding: metrics.padding(10),
+    borderRadius: metrics.borderRadius(12),
+    alignItems: 'center',
+  },
+  submitButton: {
+    flex: 1,
+    backgroundColor: '#28a745',
+    padding: metrics.padding(16),
+    borderRadius: metrics.borderRadius(12),
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: '#fff',
+    fontSize: metrics.fontSize(16),
+    fontWeight: '600',
   },
 });
 

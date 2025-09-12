@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import {
   View,
   Text,
@@ -13,7 +13,7 @@ import metrics from '../constants/metrics';
 import LocationIcon from '../Icons/LocationIcon';
 
 interface AppTextInputProps extends TextInputProps {
-  label?: string;
+  label?: string|ReactNode;
   error?: string;
   touched?: boolean;
   textInputContainerStyle?: any;

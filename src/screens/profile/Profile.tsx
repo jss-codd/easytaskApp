@@ -1,37 +1,39 @@
 import React from 'react';
-import { Text, TouchableOpacity, View } from 'react-native';
-import { logout } from '../../store/slices/authSlice';
+import { ScrollView, StyleSheet } from 'react-native';
 import Colors from '../../constants/color';
-import { useAppDispatch } from '../../store/store';
+import { useAppSelector } from '../../store/store';
+import ProfileCard from '../../components/ProfileCard';
 import { useNavigation } from '@react-navigation/native';
-import { Screen } from '../../utils/type';
 
 const Profile = () => {
-  const dispatch = useAppDispatch();
-  const navigation= useNavigation();
+  const { profile } = useAppSelector((state: any) => state.authReducer);
+  const navigation = useNavigation();
+
+  const handleEditPress = () => {
+    navigation.navigate('UpdateProfile' as never);
+  };
+
+  const handleRoleChange = (newRole: string) => {
+    console.log('Role changed to:', newRole);
+  };
+
   return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text>Welcome to the Profile Screen</Text>
-      <TouchableOpacity>
-        <Text
-          style={{
-            justifyContent: 'center',
-            backgroundColor: Colors.CHARCOAL_GRAY,
-            padding: 10,
-            color: Colors.WHITE,
-            borderRadius: 5,
-            fontSize: 16,
-          }}
-          onPress={() => {
-            dispatch(logout());
-            navigation.navigate(Screen.Login as never); 
-          }}
-        >
-          LOGOUT
-        </Text>
-      </TouchableOpacity>
-    </View>
+    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+      <ProfileCard 
+        profile={profile} 
+        onEditPress={handleEditPress}
+        showEditButton={true}
+        onRoleChange={handleRoleChange}
+      />
+    </ScrollView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: Colors.BACKGROUND,
+  },
+});
 
 export default Profile;

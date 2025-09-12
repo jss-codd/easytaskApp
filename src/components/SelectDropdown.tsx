@@ -3,44 +3,35 @@ import SelectDropdown from 'react-native-select-dropdown';
 import Colors from '../constants/color';
 import metrics from '../constants/metrics';
 import { ArrowDown } from '../Icons/BackIcon';
+
 const SelDropdown = ({
   data,
   onSelect,
-  renderButton,
-  renderItem,
-  showsVerticalScrollIndicator,
-  dropdownStyle,
   placeholder,
+  value, // 👈 add this
 }: any) => {
   return (
     <SelectDropdown
       data={data}
+      defaultValue={data.find((item: any) => item.value === value) || null} 
       onSelect={(selectedItem, index) => {
         onSelect(selectedItem, index);
       }}
       renderButton={(selectedItem, isOpened) => {
         return (
           <View style={styles.dropdownButtonStyle}>
-            <Text style={[styles.dropdownButtonTxtStyle, { color: Colors.BLACK }]}>
+            <Text
+              style={[
+                styles.dropdownButtonTxtStyle,
+                { color: Colors.BLACK },
+              ]}
+            >
               {(selectedItem && selectedItem.label) || placeholder}
             </Text>
             <ArrowDown />
-            {/* <Icon name={isOpened ? 'chevron-up' : 'chevron-down'} style={styles.dropdownButtonArrowStyle} /> */}
           </View>
         );
       }}
-      // renderItem={(item, index, isSelected) => {
-      //   return (
-      //     <View
-      //       style={{
-      //         ...styles.dropdownItemStyle,
-      //         ...(isSelected && { backgroundColor: '#F1F3F6' }),
-      //       }}
-      //     >
-      //       <Text style={styles.dropdownItemTxtStyle}>{item.label}</Text>
-      //     </View>
-      //   );
-      // }}
       renderItem={(item, index, isSelected) => {
         return data.length === 0 ? (
           <View style={styles.noDataContainer}>
@@ -62,6 +53,7 @@ const SelDropdown = ({
     />
   );
 };
+
 const styles = StyleSheet.create({
   noDataContainer: {
     padding: 16,

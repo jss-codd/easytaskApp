@@ -12,6 +12,7 @@ const toastConfig = {
       contentContainerStyle={styles.content}
       text1Style={styles.text1}
       text2Style={styles.text2}
+      position="bottom"
     />
   ),
   error: (props: any) => (
@@ -21,6 +22,7 @@ const toastConfig = {
       contentContainerStyle={styles.content}
       text1Style={styles.text1}
       text2Style={styles.text2}
+      position="bottom"
     />
   ),
 };
@@ -29,7 +31,7 @@ const styles = StyleSheet.create({
   base: {
     borderLeftWidth: 8,
     borderRadius: metrics.borderRadius(10),
-    minHeight: metrics.height(60),
+    minHeight: metrics.height(40),
     marginHorizontal: metrics.marginHorizontal(8),
     marginTop: metrics.marginTop(8),
     elevation: 2,
@@ -56,7 +58,7 @@ const styles = StyleSheet.create({
   },
 });
 
-const CommonToast = () => <Toast config={toastConfig} />;
+const CommonToast = () => <Toast config={toastConfig}  position='bottom'/>;
 
 export default CommonToast;
 export { Toast };

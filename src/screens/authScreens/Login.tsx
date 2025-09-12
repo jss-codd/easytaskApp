@@ -1,27 +1,50 @@
-import React, { useEffect } from 'react';
-import { View, TouchableOpacity, Text, Alert } from 'react-native';
-import { Formik } from 'formik';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
+import {
+  View,
+  TouchableOpacity,
+  Text,
+  Alert,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
+  StatusBar,
+} from 'react-native';
+import { Formik, FormikProps } from 'formik';
 import CustomTextInput from '../../components/CustomTextInput';
 import { loginSchema } from '../../schemas/loginSchema';
-import { useNavigation } from '@react-navigation/native';
+import { NavigationProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { RootState, useAppDispatch } from '../../store/store';
 import { loginUser } from '../../store/slices/authSlice';
 import { Screen } from '../../utils/type';
 import { loginStyles } from './style';
 import { useSelector } from 'react-redux';
 import Toast from 'react-native-toast-message';
+import CustomPasswordInput from '../../components/CustomPasswordInput';
+import Colors from '../../constants/color';
 
 const Login = () => {
-  const navigation = useNavigation();
+  const navigation = useNavigation<NavigationProp<any>>();
   const dispatch = useAppDispatch();
 
+  const formRef = useRef<FormikProps<any>>(null);
   const { error, loading, isAuthenticated } = useSelector(
     (state: RootState) => state.authReducer,
   );
 
+  const [showPassword, setShowPassword] = useState(false);
   const navigateToSignup = () => {
     navigation.navigate(Screen.Register as never);
   };
+
+  useFocusEffect(
+    useCallback(() => {
+      if (formRef.current) {
+        formRef.current.resetForm();
+      }
+    }, [])
+  );
 
   useEffect(() => {
     if (isAuthenticated) {
@@ -44,91 +67,112 @@ const Login = () => {
   }, [error]);
 
   return (
-    <View style={loginStyles.container}>
-      <Text style={loginStyles.title}>Login to Your Account</Text>
-      <Formik
-        initialValues={{ email: '', password: '' }}
-        validationSchema={loginSchema}
-        onSubmit={values => {
-          const { email, password } = values;
-          if (!email || !password) {
-            Alert.alert('Error', 'Please fill in all fields');
-            return;
-          }
-          dispatch(loginUser({ email, password }));
-
-          // console.log('Login attempt with:', { email, password });
-        }}
+    <ScrollView
+      contentContainerStyle={{ flexGrow: 1 }}
+      showsVerticalScrollIndicator={false}
+      showsHorizontalScrollIndicator={false}
+    >
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={loginStyles.container}
       >
-        {({
-          handleChange,
-          handleBlur,
-          handleSubmit,
-          values,
-          errors,
-          touched,
-        }) => (
-          <>
-            <CustomTextInput
-              placeholder="Enter your email"
-              value={values.email}
-              onChangeText={handleChange('email')}
-              onBlur={handleBlur('email')}
-              keyboardType="email-address"
-              autoCapitalize="none"
-              autoCorrect={false}
-              error={errors.email}
-              touched={touched.email}
-            />
-
-            <CustomTextInput
-              placeholder="Enter your password"
-              value={values.password}
-              onChangeText={handleChange('password')}
-              onBlur={handleBlur('password')}
-              secureTextEntry
-              autoCapitalize="none"
-              error={errors.password}
-              touched={touched.password}
-            />
-
-            <TouchableOpacity
-              style={loginStyles.forgotPassword}
-              onPress={() =>
-                Alert.alert(
-                  'Forgot Password',
-                  'Reset password functionality not implemented yet',
-                )
-              }
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+          <View style={loginStyles.formContainer}>
+            <StatusBar backgroundColor={Colors.MAIN_COLOR} barStyle="dark-content" />
+            <Text style={loginStyles.title}>Login to Your Account</Text>
+            <Formik
+              innerRef={formRef}
+              initialValues={{ email: '', password: '' }}
+              validationSchema={loginSchema}
+              onSubmit={values => {
+                const { email, password } = values;
+                if (!email || !password) {
+                  Alert.alert('Error', 'Please fill in all fields');
+                  return;
+                }
+                dispatch(loginUser({ email, password }));
+              }}
             >
-              <Text style={loginStyles.forgotPasswordText}>
-                Forgot Password?
-              </Text>
-            </TouchableOpacity>
+              {({
+                handleChange,
+                handleBlur,
+                handleSubmit,
+                values,
+                errors,
+                touched,
+              }) => (
+                <>
+                  <CustomTextInput
+                    placeholder="Enter your email"
+                    value={values.email}
+                    onChangeText={handleChange('email')}
+                    onBlur={handleBlur('email')}
+                    keyboardType="email-address"
+                    autoCapitalize="none"
+                    autoCorrect={false}
+                    error={errors.email as string}
+                    touched={touched.email as boolean}
+                  />
 
-            <TouchableOpacity
-              style={
-                loading
-                  ? loginStyles.loginButtonLoading
-                  : loginStyles.loginButton
-              }
-              onPress={handleSubmit}
-            >
-              <Text style={loginStyles.loginButtonText}>
-                {loading ? 'Logging in...' : 'Login'}
-              </Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </Formik>
+                  {/* <CustomTextInput
+                    placeholder="Enter your password"
+                    value={values.password}
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    secureTextEntry
+                    autoCapitalize="none"
+                    error={errors.password as string}
+                    touched={touched.password as boolean}
+                  /> */}
+                  <CustomPasswordInput
+                    placeholder='Enter your password'
+                    value={values.password}
+                    onChangeText={handleChange('password')}
+                    onBlur={handleBlur('password')}
+                    error={errors.password as string}
+                    touched={touched.password as boolean}
+                  />
 
-      <View style={loginStyles.footer}>
-        <Text style={loginStyles.footerText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={navigateToSignup}>
-          <Text style={loginStyles.signupLink}>Sign Up</Text>
-        </TouchableOpacity>
-      </View>
-    </View>
+
+                 <TouchableOpacity
+                    style={loginStyles.forgotPassword}
+                    onPress={() =>
+                      navigation.navigate(Screen.ForgotPassword)
+                    }
+                  >
+                    <Text style={loginStyles.forgotPasswordText}>
+                      Forgot Password?
+                    </Text>
+                  </TouchableOpacity> 
+
+                  <TouchableOpacity
+                    style={
+                      loading
+                        ? loginStyles.loginButtonLoading
+                        : loginStyles.loginButton
+                    }
+                    onPress={handleSubmit}
+                  >
+                    <Text style={loginStyles.loginButtonText}>
+                      {loading ? 'Logging in...' : 'Login'}
+                    </Text>
+                  </TouchableOpacity>
+                </>
+              )}
+            </Formik>
+
+            <View style={loginStyles.footer}>
+              <Text style={loginStyles.footerText}>
+                Don't have an account?{' '}
+              </Text>
+              <TouchableOpacity onPress={navigateToSignup}>
+                <Text style={loginStyles.signupLink}>Sign Up</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </TouchableWithoutFeedback>
+      </KeyboardAvoidingView>
+    </ScrollView>
   );
 };
 
