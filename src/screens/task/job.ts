@@ -72,8 +72,10 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'flex-start',
     alignItems: 'flex-start',
-    top: Math.min(height * 0.08, metrics.height(60)),
-    left: Math.min(width * 0.04, metrics.width(60)),
+    top: metrics.height(105),
+    left: metrics.width(10),
+    // top: Math.min(height * 0.08, metrics.height(70)),
+    // left: Math.min(width * 0.04, metrics.width(60)),
     zIndex: 1000,
     backgroundColor: 'transparent',
     
@@ -95,7 +97,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   modalTitle: {
-    fontSize: Math.min(width * 0.045, metrics.fontSize(18)),
+    fontSize: Math.min(width * 0.045, metrics.fontSize(14)),
     fontWeight: '700',
     marginBottom: Math.min(height * 0.02, metrics.margin(16)),
     color: Colors.BLACK,
@@ -105,18 +107,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: Math.min(width * 0.02, metrics.padding(8)),
     borderRadius: Math.min(width * 0.02, metrics.borderRadius(8)),
     marginBottom: metrics.margin(6),
+    textTransform: 'capitalize',
   },
   modalOptionSelected: {
     backgroundColor: '#e3f2fd',
   },
   modalOptionText: {
-    fontSize: Math.min(width * 0.04, metrics.fontSize(16)),
+    fontSize: Math.min(width * 0.04, metrics.fontSize(12)),
     color: '#333',
+    textTransform: 'capitalize',
   },
   modalOptionTextSelected: {
-    fontSize: Math.min(width * 0.04, metrics.fontSize(16)),
+    fontSize: Math.min(width * 0.04, metrics.fontSize(12)),
     color: '#1565c0',
     fontWeight: '700',
+    textTransform: 'capitalize',
   },
   filterDropdown: {
     position: 'absolute',

@@ -22,7 +22,7 @@ interface MultiSelectDropdownProps {
   showTags?: boolean;
 }
 
-const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
+const MultiSelectDropdown = ({
   data,
   selectedValues,
   placeholder = 'Select options',
@@ -31,7 +31,7 @@ const MultiSelectDropdown: React.FC<MultiSelectDropdownProps> = ({
   buttonTextStyle,
   menuStyle,
   showTags = true,
-}) => {
+}: MultiSelectDropdownProps) => {
   const [open, setOpen] = useState(false);
 
   const toggleSelection = (item: { label: string; value: string | number }) => {

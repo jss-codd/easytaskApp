@@ -3,7 +3,6 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
@@ -18,7 +17,6 @@ import { BaseUrl } from '../../service/axiosInterceptor';
 import axios from 'axios';
 import { Screen } from '../../utils/type';
 import Colors from '../../constants/color';
-import EyeIcon from '../../Icons/EyeIcon';
 import metrics from '../../constants/metrics';
 import { loginStyles } from './style';
 import CustomPasswordInput from '../../components/CustomPasswordInput';
@@ -31,12 +29,10 @@ const SetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [newPasswordError, setNewPasswordError] = useState('');
   const [confirmPasswordError, setConfirmPasswordError] = useState('');
-  const [showNewPassword, setShowNewPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-
+ 
   const route = useRoute();
   const { token } = route.params as { token: string };
-  console.log('token from set password', token);
+  
   const handleSetPassword = async () => {
     let isValid = true;
 
@@ -77,7 +73,6 @@ const SetPassword = () => {
           {
             newPassword: newPassword,
             token: token,
-            // confirmPassword: confirmPassword,
           },
           {
             headers: {
@@ -114,77 +109,10 @@ const SetPassword = () => {
         style={styles.container}>
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.formContainer}>
-            {/* <Text style={styles.title}>{projectTitle}</Text> */}
-            {/* <Text style={styles.title}>Set New Password</Text> */}
+
             <Text style={styles.subtitle}>
               Create a strong password for your account
             </Text>
-            {/* 
-            <View style={styles.inputContainer}>
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={[
-                    styles.passwordInput,
-                    newPasswordError ? styles.inputError : null,
-                  ]}
-                  placeholderTextColor={Colors.GREY}
-                  placeholder="Enter new password"
-                  value={newPassword}
-                  onChangeText={text => {
-                    setNewPassword(text);
-                    setNewPasswordError('');
-                  }}
-                  secureTextEntry={!showNewPassword}
-                />
-                <TouchableOpacity
-                  style={styles.showPasswordButton}
-                  onPress={() => setShowNewPassword(!showNewPassword)}>
-                  <Text style={styles.showPasswordText}>
-                    {showNewPassword ? (
-                      <EyeIcon.EyeIcon color={Colors.GREY} />
-                    ) : (
-                      <EyeIcon.OpenEyeIcon color={Colors.GREY} />
-                    )}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              {newPasswordError && (
-                <Text style={styles.errorText}>{newPasswordError}</Text>
-              )}
-            </View>
-
-            <View style={styles.inputContainer}>
-              <View style={styles.passwordContainer}>
-                <TextInput
-                  style={[
-                    styles.passwordInput,
-                    confirmPasswordError ? styles.inputError : null,
-                  ]}
-                  placeholderTextColor={Colors.GREY}
-                  placeholder="Confirm new password"
-                  value={confirmPassword}
-                  onChangeText={text => {
-                    setConfirmPassword(text);
-                    setConfirmPasswordError('');
-                  }}
-                  secureTextEntry={!showConfirmPassword}
-                />
-                <TouchableOpacity
-                  style={styles.showPasswordButton}
-                  onPress={() => setShowConfirmPassword(!showConfirmPassword)}>
-                  <Text style={styles.showPasswordText}>
-                    {showConfirmPassword ? (
-                      <EyeIcon.EyeIcon color={Colors.GREY} />
-                    ) : (
-                      <EyeIcon.OpenEyeIcon color={Colors.GREY} />
-                    )}
-                  </Text>
-                </TouchableOpacity>
-              </View>
-              {confirmPasswordError && (
-                <Text style={styles.errorText}>{confirmPasswordError}</Text>
-              )}
-            </View> */}
             <CustomPasswordInput
               placeholder="Enter new password"
               value={newPassword}
@@ -199,8 +127,6 @@ const SetPassword = () => {
               error={confirmPasswordError}
               touched={confirmPasswordError ? true : false}
             />
-
-
             <TouchableOpacity
               style={loginStyles.loginButton}
               onPress={handleSetPassword}>
@@ -261,7 +187,6 @@ const styles = StyleSheet.create({
     height: Math.max(48, metrics.height(48)),
     paddingHorizontal: metrics.padding(16),
     fontSize: Math.min(width * 0.04, metrics.fontSize(16)),
-    // backgroundColor: Colors.WHITE,
     color: Colors.BLACK,
     borderRadius: metrics.borderRadius(8),
   },

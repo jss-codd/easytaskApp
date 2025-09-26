@@ -17,13 +17,13 @@ interface AppPasswordInputProps extends TextInputProps {
     touched?: boolean;
 }
 
-const CustomPasswordInput: React.FC<AppPasswordInputProps> = ({
+const CustomPasswordInput=({
     label,
     error,
     touched,
     placeholder,
     ...props
-}) => {
+}: AppPasswordInputProps) => {
     const [isSecure, setIsSecure] = useState(true);
     const showError = touched && error;
 

@@ -20,7 +20,7 @@ interface SearchInputProps {
   inputRef?: React.RefObject<TextInput>;
 }
 
-const SearchInput: React.FC<SearchInputProps> = ({
+const SearchInput= ({
   value,
   onChangeText,
   placeholder = 'Search...',
@@ -28,10 +28,10 @@ const SearchInput: React.FC<SearchInputProps> = ({
   inputStyle,
   autoFocus = false,
   inputRef,
-}) => {
+}: SearchInputProps) => {
   return (
     <View style={[styles.container, containerStyle]}>
-      <SearchIcon size={20} color="#777" />
+      <SearchIcon size={15} color="#777" />
       <TextInput
         style={[styles.input, inputStyle]}
         placeholder={placeholder}

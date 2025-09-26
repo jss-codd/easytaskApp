@@ -6,22 +6,16 @@ export const signIn = async (data: { email: string; password: string }) => {
 };
 
 export const signUp = async (payload: any) => {
-  try {
-    const response = await api.post('/auth/register', payload);
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await api.post('/auth/register', payload);
+  return response.data;
 };
 
 export const verifyEmail = async (payload: any) => {
   const response = await api.post('/auth/verify', payload);
-  console.log('response', response.data);
   return response.data;
 };
 export const resendVerification = async (payload: any) => {
   const response = await api.post('/auth/resend-verification', payload);
-  console.log('resend-response', response.data);
   return response.data;
 };
 
@@ -41,13 +35,11 @@ export const updateUserProfile = async (payload: any) => {
       'Content-Type': 'multipart/form-data',
     },
   });
-  console.log(response.data);
-  return response.data;
+  return response;
 };
 
 export const updateUserRole = async (role: string) => {
   const response = await api.patch('/user', { role });
-  console.log('Role update response:', response.data);
   return response.data;
 };
 
@@ -56,15 +48,16 @@ export const changePassword = async (payload: any) => {
   return response.data;
 };
 
-export const getTasks = async (search: string,) => {
-  const response = await api.get(`/tasks?search=${search}`);
+export const getTasks = async (search: string, categories: string,fixedPrice: string) => {
+  const response = await api.get(`/tasks?search=${search}&categories=${categories}&fixedPrice=${fixedPrice}`);
   return response.data;
 };
 
-export const getAllBrowseTasks = async (search: string,userId: string) => {
-  const response = await api.get(`/tasks/public?search=${search}&userId=${userId}`);
+export const getAllBrowseTasks = async (search: string, userId: string, categories: string,fixedPrice: string) => {
+  const response = await api.get(`/tasks/public?search=${search}&userId=${userId}&categories=${categories}&fixedPrice=${fixedPrice}`);
   return response.data;
 };
+
 export const getAllTaskById = async (id: string) => {
   const response = await api.get(`/tasks/${id}`);
   return response.data;
@@ -104,7 +97,7 @@ export const updateTask = async (id: string, payload: any) => {
 };
 
 export const archiveTask = async (id: string, payload: any) => {
-  const response = await api.patch(`/tasks/archive/${id}`,{payload});
+  const response = await api.patch(`/tasks/archive/${id}`, payload);
   return response.data;
 };
 
@@ -115,7 +108,6 @@ export const getCategories = async () => {
 
 export const getSubCategories = async (categoryId: string) => {
   const response = await api.get(`/categories/${categoryId}/subcategories`);
-  console.log('response', response.data);
   return response.data;
 };
 
@@ -156,7 +148,6 @@ export const getChatMessages = async (chatId: string) => {
 
 export const saveTasks = async (taskId: string) => {
   const response = await api.post(`/tasks/${taskId}/bookmark`);
-  console.log(response.data)
   return response.data;
 };
 
@@ -167,5 +158,50 @@ export const unsaveTasks = async (taskId: string) => {
 
 export const saveFcmToken = async (payload: any) => {
   const response = await api.post('/user/fcm-token', payload);
+  return response.data;
+};
+
+export const createContract = async (payload: any) => {
+  const response = await api.post('/tasks/create-contract', payload);
+  return response.data;
+};
+
+export const acceptContract = async (contractId: string) => {
+  const response = await api.post(`/tasks/contract/${contractId}/accept`);
+  return response.data;
+};
+
+export const rejectContract = async (contractId: string, reason: string) => {
+  const response = await api.post(`/tasks/contract/${contractId}/reject`, { reason });
+  return response.data;
+};
+
+export const closeJob = async (contractId: string) => {
+  const response = await api.post(`/tasks/contract/${contractId}/close`);
+  return response.data;
+};
+
+export const withdrawContract = async (contractId: string) => {
+  const response = await api.post(`/tasks/contract/${contractId}/withdraw`);
+  return response.data;
+};
+
+export const getWallet = async () => {
+  const response = await api.get('/wallet/balance');
+  return response.data;
+};
+
+export const verifyPayment = async (payload: any) => {
+  const response = await api.post('/wallet/verify-payment', payload);
+  return response.data;
+};
+
+export const addWalletBalance = async (payload: any) => {
+  const response = await api.post('/wallet/add-funds', payload);
+  return response.data;
+};
+
+export const releasePayment = async (taskId: string) => {
+  const response = await api.post(`/wallet/release-task/${taskId}`);
   return response.data;
 };

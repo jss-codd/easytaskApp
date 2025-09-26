@@ -5,6 +5,7 @@ import Colors from '../../../constants/color';
 import { Toast } from '../../../components/CommonToast';
 import axios from 'axios';
 import { resendVerification } from '../../../service/apiService';
+import { useTranslation } from 'react-i18next';
 
 interface Props {
   values: any;
@@ -15,17 +16,18 @@ interface Props {
   resetForm: any;
 }
 
-const Verification: React.FC<Props> = ({
+const Verification = ({
   values,
   errors,
   touched,
   setFieldValue,
   handleSubmitForm,
   resetForm,
-}) => {
+}: Props) => {
   const [resending, setResending] = useState(false);
+  
+  const { t } = useTranslation();
   const inputs = useRef<any[]>([]);
-  console.log('values', values.email);
 
   const handleResendOtp = async () => {
     try {
@@ -35,15 +37,11 @@ const Verification: React.FC<Props> = ({
         { email: values.email }
       );
 
-      console.log('Resend OTP response:', response);
-
       Toast.show({
         type: 'success',
         text1: response.message || 'OTP resent successfully',
       });
     } catch (err: any) {
-      console.error('Resend OTP error:', err.response?.data?.message);
-
       const errorMessage =
         err.response?.data?.message || 'Failed to resend OTP. Please try again.';
 
@@ -57,35 +55,11 @@ const Verification: React.FC<Props> = ({
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Verify Your Account</Text>
+      <Text style={styles.title}>{t('auth.verifyYourAccount')}</Text>
       <Text style={styles.subtitle}>
-        Enter the 4-digit code sent to your email
+        {t('auth.enterThe4DigitCodeSentToYourEmail')}
       </Text>
       <View style={styles.otpBoxContainer}>
-        {/* {Array.from({ length: 4 }).map((_, index) => (
-          <TextInput
-            key={index}
-            style={[
-              styles.otpBox,
-              errors.otp && touched.otp && styles.inputError,
-            ]}
-            value={values.otp[index] || ''}
-            keyboardType="numeric"
-            maxLength={1}
-            onChangeText={text => {
-              const otpArray = values.otp.split('');
-              otpArray[index] = text;
-              const updatedOtp = otpArray.join('');
-              setFieldValue('otp', updatedOtp);
-              console.log('Updated OTP:', updatedOtp);
-
-              if (text && index < 3) {
-                inputs.current[index + 1].focus();
-              }
-            }}
-            ref={(ref: any) => (inputs.current[index] = ref)}
-          />
-        ))} */}
         {Array.from({ length: 4 }).map((_, index) => (
           <TextInput
             key={index}
@@ -134,14 +108,14 @@ const Verification: React.FC<Props> = ({
           {resending ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.buttonText}>Resend OTP</Text>
+            <Text style={styles.buttonText}>{t('auth.resendOtp')}</Text>
           )}
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.submitButton}
           onPress={() => handleSubmitForm(values, resetForm)}
         >
-          <Text style={styles.buttonText}>Submit</Text>
+          <Text style={styles.buttonText}>{t('auth.submit')}</Text>
         </TouchableOpacity>
       </View>
 

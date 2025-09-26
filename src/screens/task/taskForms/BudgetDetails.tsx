@@ -15,8 +15,7 @@ import FormStyles from './taskForm';
 import { formatDate, goNextStep } from '../../../utils/helper';
 import FileInput from '../../../components/FileInput';
 import { stepFields } from '../../../utils/type';
-import Colors from '../../../constants/color';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { useTranslation } from 'react-i18next';
 
 const BudgetDetails = ({
   values,
@@ -29,10 +28,12 @@ const BudgetDetails = ({
   validateForm,
   setFieldTouched,
 }: any) => {
+  const { t } = useTranslation();
+
   const [showDatePicker, setShowDatePicker] = useState(false);
+    
   const handleDateChange = (event: any, selectedDate?: Date) => {
     setShowDatePicker(false);
-    console.log('selectedDate', selectedDate);
     if (selectedDate) {
       setFieldValue('deadline', formatDate(selectedDate));
     }
@@ -48,14 +49,14 @@ const BudgetDetails = ({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={FormStyles.title}>Budget Details</Text>
+          <Text style={FormStyles.title}>{t('task.budgetDetails')}</Text>
           <CustomInput
             label={
               <Text>
-                Estimate Budget<Text style={{color: 'red'}}>*</Text>
+                {t('task.estimateBudget')}<Text style={{color: 'red'}}>*</Text>
               </Text>
             }
-            placeholder="Estimate Budget"
+            placeholder={t('task.estimateBudget')}
             value={String(values.estimateBudget)}
             keyboardType="numeric"
             onChangeText={handleChange('estimateBudget')}
@@ -64,14 +65,14 @@ const BudgetDetails = ({
           <CustomInput
             label={
               <Text>
-                Deadline<Text style={{color: 'red'}}>*</Text>
+                {t('task.deadline')}<Text style={{color: 'red'}}>*</Text>
               </Text>
             }
-            placeholder="Deadline"
+            placeholder={t('task.deadline')}
             value={values.deadline}
             onChangeText={handleChange('deadline')}
             onPress={() => setShowDatePicker(true)}
-            disabled={true}
+            disabled={true}           
             // showChevron={true}
             error={touched.deadline && errors.deadline}
           />
@@ -80,13 +81,13 @@ const BudgetDetails = ({
               value={values.deadline ? new Date(values.deadline) : new Date()}
               mode="date"
               display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-
+              minimumDate={new Date()}
               onChange={handleDateChange}
             />
           )}
           <CustomInput
-            label="Note"
-            placeholder="Note"
+            label={t('task.note')}
+            placeholder={t('task.note')}
             value={values.note}
             onChangeText={handleChange('note')}
             multiline
@@ -94,30 +95,25 @@ const BudgetDetails = ({
             textInputContainerStyle={{ height: 100 }}
           // error={touched.note && errors.note}
           />
-          {/* <FileInput
-            label="Task Image"
-            placeholder="Task Image"
-            value={values.media}
-            onSelectFile={(file: any) => setFieldValue('media', file)}
-          /> */}
+         
           <FileInput
-            label="Task Files"
+            label={t('task.taskFiles')}
             placeholder="images/docs"
             allowMultiSelection={true}
             value={values.media} 
             onSelectFile={(files: any[]) => setFieldValue('media', files)}
           />
 
-          {/* {errors.laSelfieUpload && touched.laSelfieUpload && (
-          <Text style={FormStyles.error}>{errors.laSelfieUpload}</Text>
-        )} */}
+          {errors.media&& touched.media && (
+          <Text style={FormStyles.error}>{errors.media}</Text>
+        )}
           <View style={FormStyles.row}>
             {step > 0 && (
               <TouchableOpacity
                 style={FormStyles.button}
                 onPress={() => setStep(step - 1)}
               >
-                <Text style={FormStyles.buttonText}>Back</Text>
+                <Text style={FormStyles.buttonText}>{t('common.back')}</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
@@ -132,7 +128,7 @@ const BudgetDetails = ({
                 )
               }
             >
-              <Text style={FormStyles.buttonText}>Next</Text>
+              <Text style={FormStyles.buttonText}>{t('common.next')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

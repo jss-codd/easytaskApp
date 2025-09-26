@@ -19,12 +19,12 @@ interface LoaderProps {
   fullScreen?: boolean;
 }
 
-const Loader: React.FC<LoaderProps> = ({
+const Loader = ({
   size = 'large',
   color = Colors.MAIN_COLOR,
   text,
   fullScreen = false,
-}) => {
+}: LoaderProps) => {
   const LoaderContent = () => (
     <View style={styles.container}>
       <ActivityIndicator size={size} color={color} style={styles.loader} />

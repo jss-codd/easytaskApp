@@ -8,8 +8,24 @@ export const Screen = {
   AllJobs: 'AllJobs',
   BidDetails: 'BidDetails',
   Profile: 'Profile',
-  ForgotPassword: 'ForgotPassword',
+  ForgotPassword: 'Forgot Password',
   SetPassword: 'reset-password',
+  UpdateProfile: 'Update Profile',
+  Categories: 'Categories',
+  ChangePassword: 'Change Password',
+  ChangeLocation: 'Change Location',
+  SavedTask: 'Saved Task',
+  Wallet: 'Wallet',
+  PostTask: 'PostTask',
+  BrowseTask: 'BrowseTask',
+  Bids: 'Bids',
+  Chat: 'Chat',
+  CreateContract: 'CreateContract',
+  MyBids: 'MyBids',
+  ApplyTask: 'ApplyTask',
+  TaskDetails: 'TaskDetails',
+  BrowseJobs: 'BrowseJobs',
+  ChatList: 'ChatList',
 };
 
 export interface User {
@@ -126,6 +142,8 @@ export interface Bid {
   offeredEstimatedTime: number;
   comment: string;
   status: string;
+  contractStatus: string;
+  contractDetails: any;
   user: {
     name: string;
     email: string;
@@ -155,4 +173,33 @@ export interface Category {
   createdAt: string;
   updatedAt: string;
   subCategories: SubCategory[];
+}
+
+export interface FilterOption {
+  id: string;
+  label: string;
+  value: any;
+  type?: 'single' | 'multiple' | 'range' | 'date';
+}
+
+export interface FilterSection {
+  id: string;
+  title: string;
+  options: FilterOption[];
+  type: 'single' | 'multiple' | 'range' | 'date';
+  selectedValues?: any[];
+}
+
+export interface FilterDrawerProps {
+  visible: boolean;
+  onClose: () => void;
+  onApply: (filters: Record<string, any>) => void;
+  onReset: () => void;
+  sections: FilterSection[];
+  title?: string;
+  showReset?: boolean;
+  showApply?: boolean;
+  selectedAppliedFilters?: Record<string, any>;
+  selectedAppliedSubcategories?: Set<string | number>;
+  expandedCategories?: Set<string | number>;
 }

@@ -11,7 +11,7 @@ interface AppTextInputProps extends TextInputProps {
   touched?: boolean;
 }
 
-const CustomTextInput: React.FC<AppTextInputProps> = ({ label, error, touched, ...props }) => {
+const CustomTextInput = ({ label, error, touched, ...props }: AppTextInputProps) => {
   const showError = touched && error;
   return (
     <View style={styles.inputContainer}>
@@ -19,6 +19,7 @@ const CustomTextInput: React.FC<AppTextInputProps> = ({ label, error, touched, .
       <TextInput
         style={[styles.input, showError && styles.inputError]}
         placeholderTextColor="#999"
+        
         {...props}
       />
       {showError ? <Text style={styles.errorText}>{error}</Text> : null}
@@ -28,10 +29,11 @@ const CustomTextInput: React.FC<AppTextInputProps> = ({ label, error, touched, .
 
 const styles = StyleSheet.create({
   inputContainer: {
+    // height: metrics.height(50),
     marginBottom: metrics.marginBottom(5),
   },
   label: {
-    fontSize: metrics.fontSize(16),
+    fontSize: metrics.fontSize(14),
     fontWeight: '600',
     color: '#1a1a1a',
   
@@ -43,8 +45,9 @@ const styles = StyleSheet.create({
     borderRadius: metrics.borderRadius(12),
     paddingHorizontal: metrics.paddingHorizontal(16),
     paddingVertical: metrics.paddingVertical(16),
-    fontSize: metrics.fontSize(16),
+    fontSize: metrics.fontSize(14),
     color: '#1a1a1a',
+    height: metrics.height(48), 
   },
   inputError: {
     borderColor: Colors.RED_ERROR,

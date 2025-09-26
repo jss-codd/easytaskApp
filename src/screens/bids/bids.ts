@@ -10,7 +10,7 @@ const styles = StyleSheet.create({
   },
   card: {
     backgroundColor: Colors.CARD_BACKGROUND,
-    borderRadius: metrics.borderRadius(10),
+    borderRadius: metrics.borderRadius(12),
     padding: metrics.padding(15),
     marginBottom: metrics.margin(15),
     elevation: 3,
@@ -21,9 +21,9 @@ const styles = StyleSheet.create({
     marginBottom: metrics.marginBottom(10),
   },
   avatar: {
-    width: metrics.width(40),
-    height: metrics.height(40),
-    borderRadius: metrics.borderRadius(100),
+    width: metrics.width(50),
+    height: metrics.width(50),
+    borderRadius: metrics.borderRadius(50)/2,
     marginRight: metrics.margin(10),
   },
   avatarPlaceholder: {
@@ -40,59 +40,59 @@ const styles = StyleSheet.create({
     marginVertical: metrics.marginVertical(10),
   },
   userEmail: {
-    color: '#666',
-    fontSize: metrics.fontSize(13),
-  
+    color: Colors.DARK_GREY,
+    fontSize: metrics.fontSize(10),
+    marginTop: metrics.marginTop(2),
   },
   taskTitle: {
-    fontSize: metrics.fontSize(16),
-    fontWeight: '600',
-    marginVertical: metrics.marginVertical(5),
+    fontSize: metrics.fontSize(12),
+    fontWeight: '500',
+    marginVertical: metrics.marginVertical(2),
     textTransform: 'capitalize',
   },
   taskDate: {
-    fontSize: metrics.fontSize(12),
+    fontSize: metrics.fontSize(10),
     color: '#888',
-    marginBottom: metrics.marginBottom(10),
+    marginBottom: metrics.marginBottom(2),
   },
   sectionTitle: {
     fontWeight: 'bold',
     marginTop: metrics.marginTop(10),
   },
   comment: {
-    color: '#444',
-    marginVertical: metrics.marginVertical(5),
+    color: Colors.DARK_GREY,
+    fontSize: metrics.fontSize(10),
+    // marginVertical: metrics.marginVertical(5),
   },
   footerRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginTop: metrics.marginTop(10),
+    marginTop: metrics.marginTop(5),
     borderTopWidth: 1,
     borderTopColor: '#eee',
-    paddingTop: metrics.paddingTop(8),
+    paddingTop: metrics.paddingTop(1),
   },
   footerText: {
     fontWeight: '500',
-    color: '#333',
+    color: Colors.DARK_GREY,
+    fontSize: metrics.fontSize(10),
   },
   footerButton: {
     backgroundColor: Colors.BUTTON_BACKGROUND,
     padding: metrics.padding(10),
-    borderRadius: metrics.borderRadius(5),
+    borderRadius: metrics.borderRadius(12),
     alignItems: 'center',
     flex: 1,
     marginHorizontal: metrics.marginHorizontal(5),
   },
   footerBtnText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontWeight: '600',
+    alignItems: 'center',
   },
   emptyContainer: {
-    //   flex: 1,
-    //   justifyContent: 'center',
     alignItems: 'center',
     marginTop: metrics.marginTop(40),
-    //   padding: RESPONSIVE.padding(20),
   },
   appliedBadge: {
     backgroundColor: Colors.SUCCESS_GREEN,
@@ -142,6 +142,17 @@ const styles = StyleSheet.create({
   searchContainer: {
     flex: 1,
     marginHorizontal: metrics.margin(8),
+  },
+  locationText: {
+    fontSize: metrics.fontSize(10),
+    color: Colors.DARK_GREY,
+    marginLeft: metrics.marginLeft(3),
+    flexShrink: 1,
+  },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: metrics.marginTop(2),
   },
 });
 

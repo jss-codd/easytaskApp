@@ -21,7 +21,7 @@ export const fetchCategories = createAsyncThunk<
 >('categories/fetchCategories', async (_, { rejectWithValue }) => {
   try {
     const response = await getCategories();
-    console.log('Fetched categories:', response);
+  
     return response;
   } catch (error: any) {
     return rejectWithValue(
@@ -37,19 +37,16 @@ const categoriesSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchCategories.fulfilled, (state, action) => {
-        // console.log('Tasks fetched successfully:', action.payload);
         state.categories = action.payload;
         state.loading = false;
         state.error = null;
       })
       .addCase(fetchCategories.rejected, (state, action) => {
-        // console.error('Failed to fetch tasks:', action.error.message);
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch tasks';
         state.categories = null; // Reset tasks on error
       })
       .addCase(fetchCategories.pending, state => {
-        // console.log('Fetching tasks...');
         state.loading = true;
         state.error = null;
       });

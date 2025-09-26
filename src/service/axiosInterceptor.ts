@@ -3,7 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export const BaseUrl = "https://api.easytaskers.com/api"
 
-export const ImageUrl = "https://easytaskers.s3.us-east-1.amazonaws.com"
+export const ImageUrl = "https://easytaskers.s3.us-east-1.amazonaws.com/"
 
 export const SocketUrl = "https://api.easytaskers.com"
 export const api = axios.create({

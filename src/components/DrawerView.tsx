@@ -1,16 +1,24 @@
-import React, { useCallback, useState } from 'react';
-import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useCallback, useEffect, useState } from 'react';
+import { Alert, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
-  DrawerItem,
 } from '@react-navigation/drawer';
 import { useSelector } from 'react-redux';
-import { logout } from '../store/slices/authSlice';
+import { getWalletBalance, logout } from '../store/slices/authSlice';
 import { RootState, useAppDispatch } from '../store/store';
 import Colors from '../constants/color';
 import { UserRole } from '../utils/enums';
 import metrics from '../constants/metrics';
+import { Screen } from '../utils/type';
+import UserIcon from '../Icons/UserIcon';
+import JobIcon from '../Icons/JobIcon';
+import EyeIcon from '../Icons/EyeIcon';
+import WalletIcon from '../Icons/WalletIcon';
+import LogoutIcon from '../Icons/Logout';
+import { formatCurrency } from '../utils/helper';
+import { SaveIcon } from '../Icons/SaveIcon';
+import { useTranslation } from 'react-i18next';
 
 const Loader = ({
   isVisible,
@@ -38,20 +46,26 @@ const Loader = ({
   );
 };
 
-const DrawerView: React.FC<DrawerContentComponentProps> = props => {
+const DrawerView = (props: DrawerContentComponentProps) => {
+  const [loading, setLoading] = useState(false);
+  
   const { state } = props;
   const activeRoute = state.routeNames[state.index];
+  const { t } = useTranslation();
 
   const isActive = (routeName: string) => routeName === activeRoute;
-  const { user } = useSelector((state: RootState) => state.authReducer);
+  const { user, walletBalance } = useSelector((state: RootState) => state.authReducer);
   const dispatch = useAppDispatch();
-  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    dispatch(getWalletBalance());
+  }, [dispatch]);
 
   const handleLogout = useCallback(() => {
     Alert.alert('Confirm', 'Are you sure you want to log out?', [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Log Out',
+        text: t('auth.logout'),
         style: 'destructive',
         onPress: async () => {
           setLoading(true);
@@ -67,82 +81,126 @@ const DrawerView: React.FC<DrawerContentComponentProps> = props => {
       <Loader isVisible={loading} color="#fff" />
 
       <View style={styles.header}>
-        <Pressable
+        {/* <TouchableOpacity
           style={styles.closeButton}
           onPress={() => props.navigation.closeDrawer()}
         >
           <Text style={styles.closeText}>✕</Text>
-        </Pressable>
+        </TouchableOpacity> */}
         <View style={styles.userInfo}>
+          {/* <View style={styles.appIconContainer}>
+            <Text style={styles.appIcon}>📱</Text>
+          </View> */}
           <Text style={styles.nameText} numberOfLines={1}>
             Easy Task
           </Text>
-
+          <Text style={styles.subtitleText}>
+            Task Management App
+          </Text>
         </View>
       </View>
 
-      {/* <View style={styles.divider} /> */}
-
       <View style={styles.menu}>
         {user.role === UserRole.Tasker ? (
-          <DrawerItem
-            label="Add Category"
-            // icon={() => (
-            //   <Icon name="view-dashboard-outline" size={28} color={Colors.GREY} />
-            // )}
-            labelStyle={styles.label}
-            onPress={() => props.navigation.navigate('Categories')}
-            style={
-              isActive('Categories')
-                ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
-                : {}
-            }
-          />
-        ) : (
-          <></>
-        )}
-        <DrawerItem
-          label="Edit Profile"
-          onPress={() => props.navigation.navigate('UpdateProfile')}
-          labelStyle={styles.label}
-          style={
-            isActive('UpdateProfile')
-              ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
-              : {}
-          }
-        />
-        <DrawerItem
-          label="Saved Task"
-          onPress={() => props.navigation.navigate('SavedTask')}
-          labelStyle={styles.label}
-          style={
-            isActive('SavedTask')
-              ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
-              : {}
-          }
-        />
+          <TouchableOpacity
+            style={[
+              styles.menuItem,
+              isActive('Categories') && styles.activeMenuItem
+            ]}
+            onPress={() => props.navigation.navigate(Screen.Categories)}
+          >
+            <View style={styles.menuItemContent}>
+              <Text style={styles.menuIcon}><SaveIcon color={Colors.GREY}/></Text>
+              <Text style={[
+                styles.menuLabel,
+                isActive('Categories') && styles.activeMenuLabel
+              ]}>
+                {t('navigation.categories')}
+              </Text>
+            </View>
+          </TouchableOpacity>
+        ) : null}
+        
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            isActive('UpdateProfile') && styles.activeMenuItem
+          ]}
+          onPress={() => props.navigation.navigate(Screen.UpdateProfile)}
+        >
+          <View style={styles.menuItemContent}>
+            <Text style={styles.menuIcon}><UserIcon size={20} color={Colors.GREY}/></Text>
+            <Text style={[
+              styles.menuLabel,
+              isActive('UpdateProfile') && styles.activeMenuLabel
+            ]}>
+              {t('navigation.editProfile')}
+            </Text>
+          </View>
+        </TouchableOpacity>
 
-        <DrawerItem
-          label="Change Password"
-          // icon={() => (
-          //   <Icon name="view-dashboard-outline" size={28} color={Colors.GREY} />
-          // )}
-          labelStyle={styles.label}
-          onPress={() => props.navigation.navigate('ChangePassword')}
-          style={
-            isActive('ChangePassword')
-              ? { backgroundColor: Colors.LIGHT_GREY, borderRadius: 30 }
-              : {}
-          }
-        />
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            isActive('SavedTask') && styles.activeMenuItem
+          ]}
+          onPress={() => props.navigation.navigate(Screen.SavedTask)}
+        >
+          <View style={styles.menuItemContent}>
+            <Text style={styles.menuIcon}><JobIcon size={20} color={Colors.GREY}/></Text>
+            <Text style={[
+              styles.menuLabel,
+              isActive('SavedTask') && styles.activeMenuLabel
+            ]}>
+              {t('navigation.savedTask')}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            isActive('ChangePassword') && styles.activeMenuItem
+          ]}
+          onPress={() => props.navigation.navigate(Screen.ChangePassword)}
+        >
+          <View style={styles.menuItemContent}>
+            <Text style={styles.menuIcon}><EyeIcon.EyeIcon color={Colors.GREY}/></Text>
+            <Text style={[
+              styles.menuLabel,
+              isActive('ChangePassword') && styles.activeMenuLabel
+            ]}>
+              {t('navigation.changePassword')}
+            </Text>
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.menuItem,
+            isActive('Wallet') && styles.activeMenuItem
+          ]}
+          onPress={() => props.navigation.navigate(Screen.Wallet)}
+        >
+          <View style={styles.menuItemContent}>
+            <Text style={styles.menuIcon}><WalletIcon color={Colors.GREY}/></Text>
+            <Text style={[
+              styles.menuLabel,
+              isActive('Wallet') && styles.activeMenuLabel
+            ]}>
+              {t('navigation.wallet')}
+            </Text>
+            <Text style={styles.menuIcon}>{formatCurrency(walletBalance)}</Text>
+          </View>
+        </TouchableOpacity>
       </View>
 
       <View style={styles.logoutSection}>
         <View style={styles.divider} />
-        <Pressable style={styles.logoutButton} onPress={handleLogout}>
-          {/* <Icon name="logout" size={28} color={Colors.GREY} /> */}
-          <Text style={styles.logoutText}>Log Out</Text>
-        </Pressable>
+        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+          <Text style={styles.logoutIcon}><LogoutIcon color='#fff'/></Text>
+          <Text style={styles.logoutText}>{t('auth.logout')}</Text>
+        </TouchableOpacity>
       </View>
     </DrawerContentScrollView>
   );
@@ -151,21 +209,53 @@ const DrawerView: React.FC<DrawerContentComponentProps> = props => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f8f9fa',
   },
   header: {
     alignItems: 'center',
-    marginTop: metrics.margin(30),
+    marginTop: metrics.margin(20),
+    paddingHorizontal: metrics.paddingHorizontal(20),
+    paddingBottom: metrics.paddingBottom(20),
+    backgroundColor: Colors.MAIN_COLOR,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-
   userInfo: {
-    marginTop: metrics.margin(25),
     alignItems: 'center',
+    marginTop: metrics.margin(15),
+  },
+  appIconContainer: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: metrics.marginBottom(10),
+  },
+  appIcon: {
+    fontSize: 30,
   },
   nameText: {
-    fontSize: metrics.fontSize(18),
-    color: Colors.MAIN_COLOR,
+    fontSize: metrics.fontSize(20),
+    color: '#ffffff',
     fontWeight: '700',
-    textTransform: 'capitalize',
+    textAlign: 'center',
+  },
+  subtitleText: {
+    fontSize: metrics.fontSize(12),
+    color: 'rgba(255, 255, 255, 0.8)',
+    fontWeight: '500',
+    marginTop: metrics.marginTop(4),
+    textAlign: 'center',
   },
   emailText: {
     fontSize: metrics.fontSize(12),
@@ -178,17 +268,61 @@ const styles = StyleSheet.create({
     fontSize: metrics.fontSize(10),
     fontWeight: '700',
     color: Colors.GREY,
-    marginTop: metrics.marginTop(4) ,
+    marginTop: metrics.marginTop(4),
     textTransform: 'capitalize',
   },
   divider: {
-    borderBottomColor: '#444',
+    borderBottomColor: Colors.LIGHT_GREY,
     borderBottomWidth: metrics.borderWidth(1),
     marginVertical: metrics.marginVertical(20),
-    marginHorizontal: metrics.marginHorizontal(30),
+    marginHorizontal: metrics.marginHorizontal(20),
   },
   menu: {
-    paddingHorizontal: metrics.paddingHorizontal(10),
+    paddingHorizontal: metrics.paddingHorizontal(15),
+    paddingTop: metrics.paddingTop(20),
+  },
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: metrics.paddingVertical(15),
+    paddingHorizontal: metrics.paddingHorizontal(15),
+    marginVertical: metrics.marginVertical(3),
+    borderRadius: 12,
+    backgroundColor: Colors.WHITE,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 1,
+    },
+    shadowOpacity: 0.05,
+    shadowRadius: 2,
+    elevation: 0.5,
+  },
+  activeMenuItem: {
+    backgroundColor: Colors.MAIN_COLOR,
+    shadowColor: Colors.MAIN_COLOR,
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  menuItemContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+  },
+  menuIcon: {
+    fontSize: metrics.fontSize(14),
+    marginRight: metrics.marginRight(15),
+    color:Colors.GREY
+  },
+  menuLabel: {
+    fontSize: metrics.fontSize(14),
+    fontWeight: '600',
+    color: Colors.GREY,
+    flex: 1,
+  },
+  activeMenuLabel: {
+    color: Colors.WHITE,
   },
   label: {
     fontSize: metrics.fontSize(14),
@@ -198,28 +332,50 @@ const styles = StyleSheet.create({
   logoutSection: {
     marginTop: 'auto',
     paddingHorizontal: metrics.paddingHorizontal(20),
-    marginBottom: metrics.marginBottom(20),
+    paddingBottom: metrics.paddingBottom(20),
   },
   logoutButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: metrics.marginTop(15),
+    justifyContent: 'center',
+    paddingVertical: metrics.paddingVertical(15),
+    paddingHorizontal: metrics.paddingHorizontal(20),
+    backgroundColor: '#ff4757',
+    borderRadius: 12,
+    marginTop: metrics.marginTop(10),
+    shadowColor: '#ff4757',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  logoutIcon: {
+    fontSize: 18,
+    marginRight: metrics.marginRight(8),
   },
   logoutText: {
-    color: Colors.MAIN_COLOR,
-    fontSize: metrics.fontSize(18),
+    color: '#ffffff',
+    fontSize: metrics.fontSize(16),
     fontWeight: '600',
-    marginLeft: metrics.marginLeft(10),
   },
   closeButton: {
     position: 'absolute',
-    right: metrics.right(20),
-    top: metrics.top(10),
+    right: metrics.right(15),
+    top: metrics.top(15),
     zIndex: 10,
+    width: 25,
+    height: 25,
+    borderRadius: 17.5,
+    // backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   closeText: {
-    fontSize: metrics.fontSize(15),
-    color: Colors.MAIN_COLOR,
+    fontSize: metrics.fontSize(12),
+    color: Colors.GREY,
     fontWeight: 'bold',
   },
 });

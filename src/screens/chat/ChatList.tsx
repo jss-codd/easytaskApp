@@ -20,9 +20,13 @@ import metrics from '../../constants/metrics';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { formatChatTime } from '../../utils/helper';
 import Loader from '../../components/Loader';
+import { useAppSelector } from '../../store/store';
+import { useTranslation } from 'react-i18next';
 
 const ChatListScreen = () => {
   const navigation = useNavigation<NavigationProp<any>>();
+  const { user } = useAppSelector(state => state.authReducer);
+  const { t } = useTranslation();
 
   const [chats, setChats] = useState<any[]>();
   const [loading, setLoading] = useState(false);
@@ -38,7 +42,6 @@ const ChatListScreen = () => {
       setLoading(true);
       const response = await getChats();
       setChats(response);
-     
       return response;
     } catch (err) {
       console.log(err);
@@ -52,17 +55,17 @@ const ChatListScreen = () => {
   }, []);
 
   const renderItem = ({ item }: { item: any }) => {
-    const userName = UserRole.Tasker ? item.poster.name : item.tasker.name;
+    const userName = user?.role === UserRole.Tasker ? item.poster.name : item.tasker.name;
     const lastMessage = item.lastMessage?.text || 'No messages yet';
     const messageTime = formatChatTime(item.lastMessage?.createdAt);
-    
+
     return (
       <TouchableOpacity
         style={styles.chatItem}
         onPress={() =>
           navigation.navigate('Chat', {
-            userId: UserRole.Tasker ? item.taskerId : item.posterId,
-            recieverId: UserRole.Tasker ? item.posterId : item.taskerId,
+            userId: user?.id,
+            recieverId: user?.role === UserRole.Tasker ? item.posterId : item.taskerId,
             chatId: item.id,
             userName: userName,
           })
@@ -71,7 +74,7 @@ const ChatListScreen = () => {
       >
         <Image
           source={{
-            uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=25D366&color=ffffff&size=100`,
+            uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(userName)}&background=25D366&color=ffffff`,
           }}
           style={styles.avatar}
         />
@@ -93,7 +96,7 @@ const ChatListScreen = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={styles.container}>
-        <Header title="Messages"/>
+        <Header title={t('navigation.message')} />
         {loading && <Loader fullScreen={true} />}
 
         <FlatList
@@ -126,41 +129,44 @@ const styles = StyleSheet.create({
   },
   avatar: {
     width: metrics.width(50),
-    height: metrics.height(50),
-    borderRadius: metrics.borderRadius(25),
+    height: metrics.width(50),
+    borderRadius: metrics.width(50) / 2,
     marginRight: metrics.marginRight(12),
     backgroundColor: Colors.LIGHT_GREY,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  chatInfoContainer: { 
-    flex: 1, 
-    flexDirection: 'column', 
+
+  chatInfoContainer: {
+    flex: 1,
+    flexDirection: 'column',
     justifyContent: 'center',
     paddingVertical: metrics.padding(2),
   },
-  chatInfo: { 
-    flexDirection: 'row', 
+  chatInfo: {
+    flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: metrics.margin(4),
   },
-  chatName: { 
-    fontSize: metrics.fontSize(15), 
-    fontWeight: '500', 
+  chatName: {
+    fontSize: metrics.fontSize(15),
+    fontWeight: '500',
     color: Colors.BLACK,
     flex: 1,
     marginRight: metrics.margin(8),
     textTransform: 'capitalize',
   },
-  lastMessage: { 
-    fontSize: metrics.fontSize(12), 
+  lastMessage: {
+    fontSize: metrics.fontSize(12),
     color: Colors.DARK_GREY,
     lineHeight: metrics.fontSize(20),
     flex: 1,
     marginRight: metrics.margin(8),
   },
-  lastMessageTime: { 
-    fontSize: metrics.fontSize(12), 
-    color: Colors.DARK_GREY, 
+  lastMessageTime: {
+    fontSize: metrics.fontSize(12),
+    color: Colors.DARK_GREY,
     fontWeight: '400',
     marginTop: metrics.margin(2),
   },

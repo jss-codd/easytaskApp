@@ -1,11 +1,14 @@
+import { ContractStatus } from "./enums";
+import Colors from "../constants/color";
+
 export const postTaskValues = {
   title: '',
   description: '',
   estimateBudget: 0,
   deadline: '',
   note: '',
-  categoryIds:[],
-  mainCategory:'',
+  categoryIds: [],
+  mainCategory: '',
   location: {
     addressLine1: '',
     addressLine2: '',
@@ -31,43 +34,57 @@ export const roles = [
 ];
 
 export const stateOptions = [
-  {label: 'Andhra Pradesh', value: 'Andhra Pradesh'},
-  {label: 'Arunachal Pradesh', value: 'Arunachal Pradesh'},
-  {label: 'Assam', value: 'Assam'},
-  {label: 'Bihar', value: 'Bihar'},
-  {label: 'Chhattisgarh', value: 'Chhattisgarh'},
-  {label: 'Goa', value: 'Goa'},
-  {label: 'Gujarat', value: 'Gujarat'},
-  {label: 'Haryana', value: 'Haryana'},
-  {label: 'Himachal Pradesh', value: 'Himachal Pradesh'},
-  {label: 'Jammu and Kashmir', value: 'Jammu and Kashmir'},
-  {label: 'Jharkhand', value: 'Jharkhand'},
-  {label: 'Karnataka', value: 'Karnataka'},
-  {label: 'Kerala', value: 'Kerala'},
-  {label: 'Madhya Pradesh', value: 'Madhya Pradesh'},
-  {label: 'Maharashtra', value: 'Maharashtra'},
-  {label: 'Manipur', value: 'Manipur'},
-  {label: 'Meghalaya', value: 'Meghalaya'},
-  {label: 'Mizoram', value: 'Mizoram'},
-  {label: 'Nagaland', value: 'Nagaland'},
-  {label: 'Odisha', value: 'Odisha'},
-  {label: 'Punjab', value: 'Punjab'},
-  {label: 'Rajasthan', value: 'Rajasthan'},
-  {label: 'Sikkim', value: 'Sikkim'},
-  {label: 'Tamil Nadu', value: 'Tamil Nadu'},
-  {label: 'Telangana', value: 'Telangana'},
-  {label: 'Tripura', value: 'Tripura'},
-  {label: 'Uttar Pradesh', value: 'Uttar Pradesh'},
-  {label: 'Uttarakhand', value: 'Uttarakhand'},
-  {label: 'West Bengal', value: 'West Bengal'},
-  {label: 'Andaman and Nicobar Islands', value: 'Andaman and Nicobar Islands'},
-  {label: 'Dadra and Nagar Haveli', value: 'Dadra and Nagar Haveli'},
-  {label: 'Daman and Diu', value: 'Daman and Diu'},
-  {label: 'Delhi', value: 'Delhi'},
-  {label: 'Lakshadweep', value: 'Lakshadweep'},
-  {label: 'Puducherry', value: 'Puducherry'},
-  {label: 'Chandigarh', value: 'Chandigarh'},
-  {label: 'Ladakh', value: 'Ladakh'},
+  { label: 'Andhra Pradesh', value: 'Andhra Pradesh' },
+  { label: 'Arunachal Pradesh', value: 'Arunachal Pradesh' },
+  { label: 'Assam', value: 'Assam' },
+  { label: 'Bihar', value: 'Bihar' },
+  { label: 'Chhattisgarh', value: 'Chhattisgarh' },
+  { label: 'Goa', value: 'Goa' },
+  { label: 'Gujarat', value: 'Gujarat' },
+  { label: 'Haryana', value: 'Haryana' },
+  { label: 'Himachal Pradesh', value: 'Himachal Pradesh' },
+  { label: 'Jammu and Kashmir', value: 'Jammu and Kashmir' },
+  { label: 'Jharkhand', value: 'Jharkhand' },
+  { label: 'Karnataka', value: 'Karnataka' },
+  { label: 'Kerala', value: 'Kerala' },
+  { label: 'Madhya Pradesh', value: 'Madhya Pradesh' },
+  { label: 'Maharashtra', value: 'Maharashtra' },
+  { label: 'Manipur', value: 'Manipur' },
+  { label: 'Meghalaya', value: 'Meghalaya' },
+  { label: 'Mizoram', value: 'Mizoram' },
+  { label: 'Nagaland', value: 'Nagaland' },
+  { label: 'Odisha', value: 'Odisha' },
+  { label: 'Punjab', value: 'Punjab' },
+  { label: 'Rajasthan', value: 'Rajasthan' },
+  { label: 'Sikkim', value: 'Sikkim' },
+  { label: 'Tamil Nadu', value: 'Tamil Nadu' },
+  { label: 'Telangana', value: 'Telangana' },
+  { label: 'Tripura', value: 'Tripura' },
+  { label: 'Uttar Pradesh', value: 'Uttar Pradesh' },
+  { label: 'Uttarakhand', value: 'Uttarakhand' },
+  { label: 'West Bengal', value: 'West Bengal' },
+  { label: 'Andaman and Nicobar Islands', value: 'Andaman and Nicobar Islands' },
+  { label: 'Dadra and Nagar Haveli', value: 'Dadra and Nagar Haveli' },
+  { label: 'Daman and Diu', value: 'Daman and Diu' },
+  { label: 'Delhi', value: 'Delhi' },
+  { label: 'Lakshadweep', value: 'Lakshadweep' },
+  { label: 'Puducherry', value: 'Puducherry' },
+  { label: 'Chandigarh', value: 'Chandigarh' },
+  { label: 'Ladakh', value: 'Ladakh' },
+];
+
+export const filterSections = [
+  {
+    id: 'priceRange',
+    title: 'Fixed Price',
+    type: 'single' as const,
+    options: [
+      { id: '1', label: 'Less Than ₹100', value: 'lt-100' },
+      { id: '2', label: '₹100 To ₹500', value: '100-500' },
+      { id: '3', label: '₹500 To ₹1k', value: '500-1000' },
+      { id: '4', label: '₹1k To ₹5k', value: '1000-5000' },
+    ],
+  },
 ];
 
 export const formatChatTime = (dateString?: string): string => {
@@ -193,3 +210,119 @@ export const getBidRange = (bidCount: number): string => {
   if (bidCount <= 500) return '200+';
   return '500+';
 };
+
+interface ButtonConfig {
+  label: string;
+  action: "edit" | "accept" | "reject" | "ongoing" | "closeJob" | "completed" | "none" | "dispute" | "review";
+  disableColor?: string;
+}
+
+export function getContractActions(status: ContractStatus | null): ButtonConfig[] {
+  switch (status) {
+    case null:
+      return [{ label: "Edit", action: "edit" }];
+    case ContractStatus.PENDING:
+      return [
+        { label: "Accept", action: "accept" },
+        { label: "Reject", action: "reject" },
+      ];
+    case ContractStatus.ACCEPTED:
+      return [{ label: "Ongoing project", action: "ongoing" }];
+    case ContractStatus.REJECTED:
+      return [{ label: "Rejected by me", action: "closeJob" }];
+    case ContractStatus.CLOSED:
+      return [{ label: "Completed", action: "completed" }];
+    case ContractStatus.COMPLETED:
+      return [{ label: "Dispute", action: "dispute" },
+      { label: "Review", action: "review" },
+      ];
+    case ContractStatus.WITHDRAWN:
+      return [{ label: "Edit", action: "edit" }];
+
+    default:
+      return [];
+  }
+}
+
+export interface ContractButtonConfig {
+  status: ContractStatus | null,
+  item: any,
+  label: string,
+  disabled: boolean,
+  backgroundColor: string,
+  handleHirePress: (item: any) => void,
+  handleWithdraw: (item: any) => void,
+  handleCloseJob: (item: any) => void
+}
+
+export function getContractButton(
+  status: ContractStatus | null,
+  item: any,
+  handleCreateContract: (item: any) => void,
+  handleWithdraw: (item: any) => void,
+  handleCloseJob: (item: any) => void,
+  handleReleasePayment: (item: any) => void
+) {
+  switch (status) {
+    case null:
+      return {
+        label: "Hire Now",
+        backgroundColor: Colors.SUCCESS_GREEN,
+        disabled: false,
+        disableColor: Colors.LIGHT_GREY,
+        onPress: () => handleCreateContract(item),
+      };
+
+    case ContractStatus.PENDING:
+      return {
+        label: "Withdraw",
+        backgroundColor: Colors.RED_ERROR,
+        disabled: false,
+        disableColor: Colors.LIGHT_GREY,
+        onPress: () => handleWithdraw(item),
+      };
+
+    case ContractStatus.ACCEPTED:
+      return {
+        label: "Close Job",
+        backgroundColor: Colors.MAIN_COLOR,
+        disabled: false,
+        disableColor: Colors.LIGHT_GREY,
+        onPress: () => handleCloseJob(item),
+      };
+
+    case ContractStatus.REJECTED:
+      return {
+        label: "Rejected",
+        backgroundColor: Colors.LIGHT_GREY,
+        disabled: true,
+        disableColor: Colors.LIGHT_GREY,
+        // onPress: () => {},
+      };
+
+    case ContractStatus.WITHDRAWN:
+      return {
+        label: "Withdrawn",
+        backgroundColor: Colors.SUCCESS_GREEN,
+        disabled: true,
+        disableColor: Colors.LIGHT_GREY,
+        // onPress: () => {},
+      };
+    case ContractStatus.COMPLETED:
+      return {
+        label: "Release Payment",
+        backgroundColor: Colors.SUCCESS_GREEN,
+        disabled: false,
+        disableColor: Colors.LIGHT_GREY,
+        onPress: () => handleReleasePayment(item),
+      };
+    default:
+      return {
+        label: "Unknown",
+        backgroundColor: Colors.LIGHT_GREY,
+        disabled: true,
+        disableColor: Colors.LIGHT_GREY,
+        // onPress: () => {},
+      };
+  }
+}

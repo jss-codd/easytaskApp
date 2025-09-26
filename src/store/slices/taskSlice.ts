@@ -1,5 +1,5 @@
-import { createAsyncThunk, createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { Meta, Task, TaskResponse } from '../../utils/type';
+import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import { TaskResponse } from '../../utils/type';
 import { getAllBrowseTasks, getTasks } from '../../service/apiService';
 
 export interface TaskState {
@@ -21,12 +21,12 @@ export const fetchTasks = createAsyncThunk<
   {
     status?: string;
     search?: string;
-   
+    categories?: string;
+    fixedPrice?: string;
   }
->('tasks/fetchTasks', async ({ search }, { rejectWithValue }) => {
+>('tasks/fetchTasks', async ({ search, categories = '',fixedPrice = '' }, { rejectWithValue }) => {
   try {
-    const response = await getTasks(search || '');
- 
+    const response = await getTasks(search || '', categories || '',fixedPrice || '');
     return response;
   } catch (error: any) {
     return rejectWithValue(
@@ -40,10 +40,12 @@ export const fetchBrowseTasks = createAsyncThunk<
   {
     search?: string;
     userId?: string;
+    categories?: string;
+    fixedPrice?: string;
   }
->('tasks/fetchBrowseTasks', async ({ search,userId }, { rejectWithValue }) => {
+>('tasks/fetchBrowseTasks', async ({ search,userId, categories = '',fixedPrice = '' }, { rejectWithValue }) => {
   try {
-    const response = await getAllBrowseTasks(search || '',userId || '');
+    const response = await getAllBrowseTasks(search || '',userId || '', categories || '',fixedPrice || '');
     return response;
   } catch (error: any) {
     return rejectWithValue(
@@ -59,7 +61,6 @@ const taskSlice = createSlice({
   extraReducers: builder => {
     builder
       .addCase(fetchTasks.fulfilled, (state, action) => {
-        // console.log('Tasks fetched successfully:', action.payload);
         state.tasks = action.payload.data;
         state.loading = false;
         state.error = null;
@@ -67,11 +68,9 @@ const taskSlice = createSlice({
       .addCase(fetchTasks.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message || 'Failed to fetch tasks';
-        state.tasks = null; // Reset tasks on error
-        // console.error('Failed to fetch tasks:', action.error.message);
+        state.tasks = null; 
       })
       .addCase(fetchTasks.pending, state => {
-        // console.log('Fetching tasks...');
         state.loading = true;
         state.error = null;
       })

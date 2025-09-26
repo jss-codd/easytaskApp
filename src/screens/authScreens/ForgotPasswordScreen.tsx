@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  TextInput,
   TouchableOpacity,
   StyleSheet,
   KeyboardAvoidingView,
@@ -20,10 +19,11 @@ import { AxiosErrorMessage } from '../../utils/type';
 import { postForgotPassword } from '../../service/apiService';
 import CustomTextInput from '../../components/CustomTextInput';
 import { loginStyles } from './style';
-
+import { useTranslation } from 'react-i18next';
 const { width } = Dimensions.get('window');
-
 const ForgotPassword = () => {
+  const { t } = useTranslation();
+  
   const [email, setEmail] = useState('');
   const [errors, setErrors] = useState('');
   const [loader, setLoader] = useState(false);
@@ -31,7 +31,6 @@ const ForgotPassword = () => {
   const [emailError, setEmailError] = useState('');
 
   const handleForgot = () => {
-    console.log('email', email);
     handleForgotPassword({ email, source: 'mobile' });
   };
 
@@ -50,11 +49,11 @@ const ForgotPassword = () => {
     try {
       if (isValid) {
         const res = await postForgotPassword(values);
-        console.log('res', res);
+  
         setRes(true);
         Toast.show({
           type: 'success',
-          text1: 'Reset Link Sent',
+          text1: t('auth.resetLinkSent'),
           text2: 'Please check your email for the reset link.',
         });
       }
@@ -62,7 +61,7 @@ const ForgotPassword = () => {
       setErrors((error as AxiosErrorMessage).response?.data?.message as string);
       Toast.show({
         type: 'error',
-        text1: 'Error Sending Reset Link',
+        text1: t('auth.errorSendingResetLink'),
         text2: (error as AxiosErrorMessage).response?.data?.message as string,
       });
     } finally {
@@ -85,7 +84,7 @@ const ForgotPassword = () => {
               {/* <Text style={styles.title}>{projectTitle}</Text> */}
               {/* <Text style={styles.title}>Forgot Password</Text> */}
               <Text style={styles.subtitle}>
-                Enter your email to receive reset link.
+                {t('auth.enterYourEmailToReceiveResetLink')}
               </Text>
               {/* {error && <Text style={styles.error}>{error}</Text>} */}
               {/* <View style={styles.inputContainer}>
@@ -110,7 +109,7 @@ const ForgotPassword = () => {
                 touched={emailError ? true : false}
               />
               <TouchableOpacity style={loginStyles.loginButton} onPress={handleForgot}>
-                <Text style={loginStyles.loginButtonText}>{loader ? 'Sending...' : 'Send Reset Link'}</Text>
+                <Text style={loginStyles.loginButtonText}>{loader ? t('auth.sending') : t('auth.sendResetLink')}</Text>
               </TouchableOpacity>
             </View>
           </View>

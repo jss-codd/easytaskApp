@@ -17,13 +17,13 @@ interface PasswordInputProps extends TextInputProps {
   touched?: boolean;
 }
 
-const PasswordInput: React.FC<PasswordInputProps> = ({
+const PasswordInput = ({
   value,
   onChangeText,
   error,
   touched,
   ...props
-}) => {
+}: PasswordInputProps) => {
   const [showPassword, setShowPassword] = useState(false);
 
   const showError = touched && !!error;

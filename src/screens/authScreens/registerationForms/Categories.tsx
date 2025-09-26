@@ -3,9 +3,7 @@ import {
   StyleSheet,
   Text,
   View,
-  Button,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
 } from 'react-native';
 import { Formik } from 'formik';
@@ -19,6 +17,7 @@ import Colors from '../../../constants/color';
 import { useNavigation } from '@react-navigation/native';
 import { getSubCategories, setCategories } from '../../../service/apiService';
 import metrics from '../../../constants/metrics';
+import { Toast } from '../../../components/CommonToast';
 
 const CategoriesForm = () => {
   const dispatch = useDispatch();
@@ -39,20 +38,16 @@ const CategoriesForm = () => {
     }
   }, [categoryItem]);
 
-  console.log('subCategories', subCategories);
 
   useEffect(() => {
     dispatch(fetchCategories() as any);
   }, [dispatch]);
 
   const fetchSubCategories = async (selectedItem: any) => {
-    console.log('selectedItem', selectedItem);
     const categoryId = categoryItem.value;
-    console.log('categoryId', categoryId);
     try {
       const response = await getSubCategories(categoryId);
       setSubCategories(response.subcategories);
-      console.log('response', response.subcategories);
     } catch (error) {
       console.log('error', error);
     }
@@ -74,20 +69,24 @@ const CategoriesForm = () => {
   };
 
   const handleSubmitForm = async (values: any) => {
-    console.log('values', values);
+
     const payload = {
       categoryIds: [values.mainCategory, ...values.categories],
     };
-    console.log('Final Payload:', payload);
 
     try {
       const response = await setCategories(payload);
-      console.log(response);
-      Alert.alert('Success', 'Categories updated successfully!');
+      Toast.show({
+        text1: 'Categories updated successfully!',
+        type: 'success',
+      });
+
       navigation.navigate('Home');
-    } catch (error) {
-      console.error('Error submitting categories:', error);
-      Alert.alert('Error', 'Failed to update job preferences');
+    } catch (error: any) {
+      Toast.show({
+        text1: 'Failed to update job preferences',
+        type: 'error',
+      });
     }
   };
 
@@ -110,9 +109,6 @@ const CategoriesForm = () => {
         <View style={styles.container}>
           <View style={styles.backButtonContainer}>
             <Text style={styles.title}>Job Preferences</Text>
-            {/* <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-              <Text style={styles.backButton}>Skip</Text>
-            </TouchableOpacity> */}
           </View>
 
           <Text style={styles.subtitle}>

@@ -9,34 +9,35 @@ import {
   Platform,
 } from 'react-native';
 import { getChatMessages } from '../../service/apiService';
-import { RouteProp, useFocusEffect } from '@react-navigation/native';
+import { RouteProp, useFocusEffect, useNavigation } from '@react-navigation/native';
 import { ChatStackParamList } from '../../navigation/AppNavigator';
 import { io, Socket } from 'socket.io-client';
-import { useAppSelector } from '../../store/store';
 import Header from '../layout/Header';
-import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Message } from '../../utils/type';
 import { styles } from './chat';
 import Loader from '../../components/Loader';
 import { SocketUrl } from '../../service/axiosInterceptor';
+import metrics from '../../constants/metrics';
 
 type ChatRouteProp = RouteProp<ChatStackParamList, 'Chat'>;
 type Props = { route: ChatRouteProp };
 
 const ChatScreen = ({ route }: Props) => {
   const { userId, chatId, recieverId, userName } = route.params;
-
+  const navigation = useNavigation<any>();
   const [messages, setMessages] = useState<Message[]>([]);
   const [text, setText] = useState('');
   const [selectedChat, setSelectedChat] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
   const flatListRef = useRef<FlatList<Message>>(null);
   const socket = useRef<Socket | null>(null);
 
   useFocusEffect(
     useCallback(() => {
       if (chatId) {
-        fetchMessages();
+        fetchMessages(chatId);
       }
     }, [chatId]),
   );
@@ -48,14 +49,29 @@ const ChatScreen = ({ route }: Props) => {
 
   useEffect(() => {
     if (chatId) {
-      fetchMessages();
+      fetchMessages(chatId);
     }
   }, [chatId]);
 
-  const fetchMessages = async () => {
+  useEffect(() => {
+    socket.current = io(SocketUrl, {
+      query: { userId },
+      auth: { ngrokSkipBrowserWarning: 'true' },
+      transports: ['websocket'],
+    });
+
+    socket.current.connect();
+    socket.current.emit('joinChat', userId);
+
+    return () => {
+      socket.current?.disconnect();
+    };
+  }, [userId]);
+
+  const fetchMessages = async (id: string) => {
     try {
       setLoading(true);
-      const response = await getChatMessages(chatId);
+      const response = await getChatMessages(id);
       if (response && Array.isArray(response)) {
         const sorted = response.sort(
           (a, b) =>
@@ -69,21 +85,6 @@ const ChatScreen = ({ route }: Props) => {
       setLoading(false);
     }
   };
-
-  socket.current = io(SocketUrl, {
-    query: {
-      userId: userId,
-    },
-    auth: {
-      ngrokSkipBrowserWarning: 'true',
-    },
-    transports: ['websocket'],
-  });
-  socket.current.connect();
-  socket.current.emit('joinChat', userId);
-  socket.current.on('activeUsers', userIds => {
-    // console.log('Active Users:', userIds);
-  });
 
   const markAsRead = (id: string, role: string) => {
     try {
@@ -100,7 +101,7 @@ const ChatScreen = ({ route }: Props) => {
       const isForCurrentChat = newMessage.chatId === selectedChat;
       if (isForCurrentChat) {
         setMessages(prev => {
-          const alreadyExists = prev.some(msg => msg.id !== newMessage.id);
+          const alreadyExists = prev.some(msg => msg.id === newMessage.id);
           if (alreadyExists) return prev;
 
           return [...prev, newMessage];
@@ -140,11 +141,10 @@ const ChatScreen = ({ route }: Props) => {
 
   const sendMessage = () => {
     if (!text.trim()) return;
-
-    const tempId = Date.now().toString() + Math.random().toString();
+    // const tempId = Date.now().toString() + Math.random().toString();
 
     const cleanMessage: Message = {
-      id: tempId,
+      // id: tempId,
       chatId,
       text: text.trim(),
       receiverId: recieverId,
@@ -154,14 +154,18 @@ const ChatScreen = ({ route }: Props) => {
     };
 
     setMessages(prev => {
-      const alreadyExists = prev.some(msg => { console.log('msg', msg); return msg.id === cleanMessage.id });
-      if (alreadyExists) return prev;
+      const firstMessage = prev.length === 0 ? true : false;
+     
+      if (firstMessage) {
+        return prev;
+      }
+      const alreadyExists = prev.some(msg => { return msg.id !== cleanMessage.id });
+      if (alreadyExists || firstMessage) return prev;
       return [...prev, cleanMessage];
     });
-
+    
     setText('');
-    const { id: _, ...payload } = cleanMessage;
-    socket.current?.emit('sendMessage', payload);
+    socket.current?.emit('sendMessage', cleanMessage);
   };
 
   const renderItem = ({ item }: { item: Message }) => {
@@ -185,49 +189,50 @@ const ChatScreen = ({ route }: Props) => {
   };
 
   return (
-    <SafeAreaProvider>
-      <SafeAreaView style={styles.chatWindow}>
-        {loading && <Loader fullScreen={true} />}
-        <Header title={userName || 'Chat'} showBack={true} />
-        <KeyboardAvoidingView
-          style={{ flex: 1 }}
-          behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-          keyboardVerticalOffset={80}
-        >
-          <FlatList
-            ref={flatListRef}
-            data={messages}
-            renderItem={renderItem}
-            keyExtractor={item => item.createdAt || item.senderId}
-            contentContainerStyle={styles.chatContainer}
-            onContentSizeChange={() =>
-              flatListRef.current?.scrollToEnd({ animated: true })
-            }
-            onLayout={() => flatListRef.current?.scrollToEnd({ animated: true })}
+    <SafeAreaView style={styles.chatWindow} edges={['top', 'bottom']} >
+      {loading && <Loader fullScreen={true} />}
+      <Header title={userName || 'Chat'} showBack={navigation.canGoBack()} />
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        // keyboardVerticalOffset={Platform.OS === 'ios' ? 64 : 64}
+      >
+     
+        <FlatList
+          ref={flatListRef}
+          data={messages}
+          renderItem={renderItem}
+          keyExtractor={item => item.createdAt || item.senderId}
+          contentContainerStyle={{
+            flexGrow: 1,
+            padding: metrics.padding(10),
+          }}
+          onContentSizeChange={() =>
+            flatListRef.current?.scrollToEnd({ animated: false })
+          }
+          onLayout={() => flatListRef.current?.scrollToEnd({ animated: false })}
+          initialScrollIndex={messages.length > 0 ? messages.length - 1 : 0}
+          getItemLayout={(data, index) => ({
+            length: 70,
+            offset: 70 * index,
+            index,
+          })}
+          keyboardShouldPersistTaps="handled"
+        />
+        <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            value={text}
+            onChangeText={setText}
+            placeholder="Type a message..."
           />
-
-          <View style={styles.inputContainer}>
-
-            <TextInput
-              style={styles.input}
-              value={text}
-              onChangeText={setText}
-              placeholder="Type a message..."
-            />
-            {/* 
-<TouchableOpacity onPress={()=>{}} style={styles.mediaButton}>
-    <Text style={{ fontSize: 20 }}>📷</Text>
-  </TouchableOpacity> */}
-
-            <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
-              <Text style={styles.sendText}>➤</Text>
-            </TouchableOpacity>
-          </View>
-        </KeyboardAvoidingView>
-      </SafeAreaView>
-    </SafeAreaProvider>
+          <TouchableOpacity style={styles.sendButton} onPress={sendMessage}>
+            <Text style={styles.sendText}>➤</Text>
+          </TouchableOpacity>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 };
-
 
 export default ChatScreen;

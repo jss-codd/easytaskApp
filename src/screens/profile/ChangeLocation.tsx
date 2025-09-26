@@ -27,8 +27,6 @@ const ChangeLocation = () => {
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      // style={FormStyles.container}
-      // enabled={!isEditing}
     >
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView

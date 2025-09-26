@@ -25,9 +25,11 @@ interface AppTextInputProps extends TextInputProps {
   showChevron?: boolean;
   onPress?: () => void;
   containerStyle?: any;
+  height?: number;
+  htmlFor?: string;
 }
 
-const CustomInput: React.FC<AppTextInputProps> = ({
+const CustomInput  = ({
   label,
   error,
   touched,
@@ -40,8 +42,10 @@ const CustomInput: React.FC<AppTextInputProps> = ({
   showChevron,
   onPress,
   containerStyle,
+  height,
+  htmlFor,
   ...props
-}) => {
+}: AppTextInputProps) => {
   return (
     <View>
       {label && (
@@ -58,13 +62,14 @@ const CustomInput: React.FC<AppTextInputProps> = ({
       >
         <View style={[styles.inputContainer, textInputContainerStyle]}>
           <TextInput
-            style={[styles.input, error && styles.inputError]}
+            style={[styles.input, error && styles.inputError, { height: height }]}
             placeholder={placeholder}
             placeholderTextColor={Colors.LIGHT_GREY}
             editable={disabled ? false : true}
             keyboardType={keyboardType}
             multiline={multiline}
             numberOfLines={numberOfLines}
+            textAlignVertical={multiline ? 'top' : 'center'}
             {...props}
           />
           {showChevron && (
@@ -105,7 +110,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: metrics.paddingHorizontal(8),
     height: metrics.height(40),
     borderRadius: metrics.borderRadius(15),
-    // backgroundColor: 'white',
     flex: 1,
     fontSize: metrics.fontSize(14),
   },

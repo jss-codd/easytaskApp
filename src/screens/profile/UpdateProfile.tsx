@@ -17,13 +17,18 @@ import CustomInput from '../../components/CustomInput';
 import { getProfile } from '../../store/slices/authSlice';
 import { updateUserProfile } from '../../service/apiService';
 import metrics from '../../constants/metrics';
+import { Toast } from '../../components/CommonToast';
+import { useNavigation } from '@react-navigation/native';
+import { useTranslation } from 'react-i18next';
 
 const UpdateProfile = () => {
   const [isEditing, setIsEditing] = useState(true);
-
+  
+  const { t } = useTranslation();
+  const navigation = useNavigation<any>();
   const dispatch = useAppDispatch();
   const { profile } = useAppSelector((state: any) => state.authReducer);
-  console.log('profile', profile);
+
   useEffect(() => {
     dispatch(getProfile());
   }, []);
@@ -32,21 +37,21 @@ const UpdateProfile = () => {
     name: profile?.name || '',
     email: profile?.email || '',
     phone: profile?.phone || '',
-    aadharNumber: profile?.aadharNumber || '',
+    aadharNumber: profile?.
+    adharcard_number
+     || '',
     permanent_address: {
       addressLine: profile?.permanent_address?.addressLine || '',
       pincode: profile?.permanent_address?.pincode || '',
       street: profile?.permanent_address?.street || '',
       state: profile?.permanent_address?.state || '',
       city: profile?.permanent_address?.city || '',
-      // country: 'India',
       latitude: 0,
       longitude: 0,
     },
   };
   
   const handleSubmitForm = async (values: any) => {
-    console.log(values);
     const formData = new FormData();
 
     formData.append('name', values.name);
@@ -56,17 +61,29 @@ const UpdateProfile = () => {
     Object.entries(values.permanent_address).forEach(([key, val]) => {
       formData.append(`permanent_address[${key}]`, val);
     });
-    console.log(formData);
     try {
       const response = await updateUserProfile(formData);
-      console.log(response);
+      if(response.status === 200){
+      Toast.show({
+        text1: 'Profile updated successfully',
+        type: 'success',
+      });
+      navigation.navigate('Profile');
+      }else{
+        Toast.show({
+          text1: response.data.message,
+          type: 'error',
+        });
+      }
       setIsEditing(false);
     } catch (error: any) {
-      console.log(error.response.data.message);
+      Toast.show({
+        text1: error.response.data.message,
+        type: 'error',
+      });
     }
   };
 
-  console.log(profile);
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -77,8 +94,6 @@ const UpdateProfile = () => {
         <ScrollView
           contentContainerStyle={{
             ...FormStyles.scrollContainer,
-            // padding: metrics.padding(20),
-            // marginBottom: metrics.marginBottom(50),
           }}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
@@ -90,10 +105,10 @@ const UpdateProfile = () => {
           >
             {({ values, errors, touched, handleSubmit, setFieldValue }) => (
               <View>
-                <Text style={FormStyles.title}>Edit Your Profile</Text>
+                <Text style={FormStyles.title}>{t('profile.updateDetails')}</Text>
                 <CustomInput
-                  label="Name"
-                  placeholder="Enter Name"
+                  label={t('profile.name')}
+                  placeholder={t('profile.name')}
                   value={values.name}
                   onChangeText={text => setFieldValue('name', text)}
                   // error={errors.name}
@@ -101,8 +116,8 @@ const UpdateProfile = () => {
                   keyboardType="default"
                 />
                 <CustomInput
-                  label="Email"
-                  placeholder="Enter Email"
+                  label={t('profile.email')}
+                  placeholder={t('profile.email')}
                   value={values.email}
                   onChangeText={text => setFieldValue('email', text)}
                   // error={errors.email}
@@ -110,8 +125,8 @@ const UpdateProfile = () => {
                   keyboardType="email-address"
                 />
                 <CustomInput
-                  label="Phone"
-                  placeholder="Enter Phone"
+                  label={t('profile.phone')}
+                  placeholder={t('profile.phone')}
                   value={values.phone}
                   onChangeText={text => setFieldValue('phone', text)}
                   // error={errors.phone}
@@ -119,30 +134,17 @@ const UpdateProfile = () => {
                   keyboardType="phone-pad"
                 />
                 <CustomInput
-                  label="Aadhar Number"
-                  placeholder="Enter Aadhar Number"
+                  label={t('profile.aadharNumber')}
+                  placeholder={t('profile.aadharNumber')}
                   value={values.aadharNumber}
                   onChangeText={text => setFieldValue('aadharNumber', text)}
                   // error={errors.aadharNumber}
                   // touched={touched.aadharNumber}
                   keyboardType="numeric"
                 />
-
                 <CustomInput
-                  label="Pincode"
-                  placeholder="Enter Pincode"
-                  value={values.permanent_address.pincode||''}
-                  editable={false}
-                  onChangeText={text =>
-                    setFieldValue('permanent_address.pincode', text)
-                  }
-                  // error={errors.pincode}
-                  // touched={touched.pincode}
-                  keyboardType="numeric"
-                />
-                <CustomInput
-                  label="Address Line"
-                  placeholder="Enter Address Line"
+                  label={t('profile.addressLine')}
+                  placeholder={t('profile.addressLine')}
                   value={values.permanent_address.addressLine}
                   onChangeText={text =>
                     setFieldValue('permanent_address.addressLine', text)
@@ -152,8 +154,8 @@ const UpdateProfile = () => {
                   keyboardType="default"
                 />
                 <CustomInput
-                  label="Street"
-                  placeholder="Enter Street"
+                    label={t('profile.street')}
+                  placeholder={t('profile.street')}
                   value={values.permanent_address.street}
                   onChangeText={text =>
                     setFieldValue('permanent_address.street', text)
@@ -163,8 +165,8 @@ const UpdateProfile = () => {
                   keyboardType="default"
                 />
                 <CustomInput
-                  label="City"
-                  placeholder="Enter City"
+                  label={t('profile.city')}
+                  placeholder={t('profile.city')}
                   value={values.permanent_address.city}
                   onChangeText={text =>
                     setFieldValue('permanent_address.city', text)
@@ -174,8 +176,8 @@ const UpdateProfile = () => {
                   keyboardType="default"
                 />
                 <CustomInput
-                  label="State"
-                  placeholder="Enter State"
+                  label={t('profile.state')}
+                  placeholder={t('profile.state')}
                   value={values.permanent_address.state}
                   onChangeText={text =>
                     setFieldValue('permanent_address.state', text)
@@ -184,14 +186,6 @@ const UpdateProfile = () => {
                   // touched={touched.state}
                   keyboardType="default"
                 />
-                {/* <CustomInput
-                    label="Country"
-                    placeholder="Enter Country"
-                    value={values.country}
-                    onChangeText={text => setFieldValue('country', text)}
-                    error={errors.country}
-                    touched={touched.country}
-                  /> */}
                 <TouchableOpacity
                   style={{
                     backgroundColor: Colors.BUTTON_BACKGROUND,
@@ -203,7 +197,7 @@ const UpdateProfile = () => {
                   onPress={handleSubmit as any}
                 >
                   <Text style={{ color: Colors.WHITE, textAlign: 'center',fontSize:metrics.fontSize(14) }}>
-                    Update Profile
+                    {t('profile.updateProfile')}
                   </Text>
                 </TouchableOpacity>
               </View>

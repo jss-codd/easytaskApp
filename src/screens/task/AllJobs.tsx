@@ -5,8 +5,6 @@ import {
   Text,
   TouchableOpacity,
   View,
-  Pressable,
-  Modal,
   StatusBar,
 } from 'react-native';
 import Colors from '../../constants/color';
@@ -27,16 +25,61 @@ import { UserRole } from '../../utils/enums';
 import SearchInput from '../../components/SearchInput';
 import { saveTasks, unsaveTasks } from '../../service/apiService';
 import MenuIcon from '../../Icons/MenuIcon';
+import { useFilterDrawer } from '../../hooks/useFilterDrawer';
+import FilterDrawer from '../../components/FilterDrawer';
+import { useTranslation } from 'react-i18next';
 
 const AllJobs = () => {
+  const { t } = useTranslation();
+
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [isSaved, setIsSaved] = useState(false);
-  const [filterModalVisible, setFilterModalVisible] = useState(false);
-  const [selectedStatus, setSelectedStatus] = useState('newest');
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
 
   const dispatch = useAppDispatch();
   const navigation = useNavigation<NavigationProp<any>>();
+
+  const filterSections = [
+    {
+      id: 'priceRange',
+      title: t('filters.fixedPrice'),
+      type: 'single' as const,
+      options: [
+        { id: '1', label: t('filters.lessThan100'), value: 'lt-100' },
+        { id: '2', label: t('filters.hundredTo500'), value: '100-500' },
+        { id: '3', label: t('filters.fiveHundredTo1k'), value: '500-1000' },
+        { id: '4', label: t('filters.oneKTo5k'), value: '1000-5000' },
+      ],
+    },
+  ];
+
+  const handleApplyFilters = useCallback((filters: Record<string, any>) => {
+    setAppliedFilters(filters);
+
+    dispatch(fetchTasks({
+      search: debouncedSearchTerm,
+      categories: filters.categories ? filters.categories.join(',') : '',
+      fixedPrice: filters.fixedPrice || ''
+    }));
+  }, [dispatch, debouncedSearchTerm]);
+
+  const handleResetFilters = useCallback(() => {
+    setAppliedFilters({});
+    dispatch(fetchTasks({ search: debouncedSearchTerm }));
+  }, [dispatch, debouncedSearchTerm]);
+
+  const {
+    isVisible,
+    openDrawer,
+    closeDrawer,
+    handleApply,
+    handleReset,
+  } = useFilterDrawer({
+    sections: filterSections,
+    onApply: handleApplyFilters,
+    onReset: handleResetFilters,
+  });
   const { tasks, loading, error } = useAppSelector(state => state.taskReducer);
   const { user } = useAppSelector((state: any) => state.authReducer);
 
@@ -57,10 +100,10 @@ const AllJobs = () => {
     dispatch(fetchTasks({ search: debouncedSearchTerm }));
   }, [dispatch, debouncedSearchTerm]);
 
+
   const handleSave = async (id: string) => {
     if (isSaved) {
       const response = await unsaveTasks(id);
-      console.log('response', response);
       dispatch(fetchTasks({ search: debouncedSearchTerm }));
       setIsSaved(false);
     } else {
@@ -88,7 +131,7 @@ const AllJobs = () => {
       bidCount={item?._count?.bids}
       owner={item?.owner}
       onViewBids={() => navigation.navigate(Screen.BidDetails, { task: item })}
-      viewButtonText="View Bids"
+      viewButtonText={t('task.viewBids')}
       selectedCategories={item?.selectedCategories}
     />
   );
@@ -98,32 +141,32 @@ const AllJobs = () => {
       <SafeAreaView style={{ flex: 1, }}>
         <StatusBar backgroundColor={Colors.MAIN_COLOR} barStyle="dark-content" />
         <Header
-          title={user?.role === UserRole.Tasker ? 'Browse Tasks' : 'My Tasks'}
+          title={user?.role === UserRole.Tasker ? t('navigation.browseTasks') : t('navigation.myTasks')}
         />
-
         <View style={styles.filterRow}>
           <TouchableOpacity
             style={styles.iconBtn}
-            onPress={() => setFilterModalVisible(true)}>
+            onPress={openDrawer}>
             <MenuIcon size={22} color={Colors.GREY} />
           </TouchableOpacity>
+          <FilterDrawer
+            visible={isVisible}
+            onClose={closeDrawer}
+            onApply={handleApply}
+            onReset={handleReset}
+            sections={filterSections}
+            title={t('filters.title')}
+            showReset={false}
+            showApply={false}
+          />
           <View style={styles.searchContainer}>
             <SearchInput
               value={searchTerm}
               onChangeText={setSearchTerm}
-              placeholder="Search..."
+              placeholder={t('filters.search')}
               autoFocus={false}
             />
           </View>
-
-          <TouchableOpacity
-            onPress={() => {
-              navigation.navigate('PostTask');
-            }}
-            style={styles.newRequestBtn}
-          >
-            <Text style={styles.newRequestText}>Post Task</Text>
-          </TouchableOpacity>
         </View>
 
         <View style={styles.container}>
@@ -135,7 +178,7 @@ const AllJobs = () => {
             </View>
           ) : tasks?.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Text>No Tasks Found</Text>
+              <Text>{t('task.noTasksFound')}</Text>
             </View>
           ) : error !== null ? (
             <View style={styles.emptyContainer}>
@@ -152,44 +195,6 @@ const AllJobs = () => {
             />
           )}
         </View>
-        <Modal
-          visible={filterModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setFilterModalVisible(false)}
-        >
-          <Pressable
-            style={styles.modalOverlay}
-            onPress={() => setFilterModalVisible(false)}
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Sort by Status</Text>
-              {[
-                { key: 'newest', value: 'newest' },
-                { key: 'oldest', value: 'oldest' },
-              ].map(option => (
-                <TouchableOpacity
-                  key={option.key}
-                  style={[
-                    styles.modalOption,
-                    selectedStatus === option.key && styles.modalOptionSelected,
-                  ]}
-                  onPress={() => setSelectedStatus(option.value)}
-                >
-                  <Text
-                    style={
-                      selectedStatus === option.value
-                        ? styles.modalOptionTextSelected
-                        : styles.modalOptionText
-                    }
-                  >
-                    {option.key}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </Pressable>
-        </Modal>
       </SafeAreaView>
     </SafeAreaProvider>
   );

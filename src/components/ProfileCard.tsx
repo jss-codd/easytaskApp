@@ -5,8 +5,8 @@ import {
   StyleSheet,
   Image,
   TouchableOpacity,
-  Alert,
   ActivityIndicator,
+  StatusBar,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Colors from '../constants/color';
@@ -15,57 +15,41 @@ import { UserRole } from '../utils/enums';
 import { updateRole } from '../store/slices/authSlice';
 import { RootState, useAppDispatch, useAppSelector } from '../store/store';
 import { Toast } from './CommonToast';
-
+import { InfoRow } from './CustomComponents';
+import metrics from '../constants/metrics';
+import { useTranslation } from 'react-i18next';
 
 interface ProfileCardProps {
   profile: any;
-  onEditPress?: () => void;
-  showEditButton?: boolean;
   onRoleChange?: (role: string) => void;
 }
 
-const ProfileCard: React.FC<ProfileCardProps> = ({
+const ProfileCard=({
   profile,
-  onEditPress,
-  showEditButton = true,
   onRoleChange,
-}) => {
+}: ProfileCardProps) => {
   const dispatch = useAppDispatch();
-  const { loading, error } = useAppSelector((state: RootState) => state.authReducer);
-  const getInitials = (name: string) => {
-    if (!name) return '?';
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
-  };
+  const { loading } = useAppSelector((state: RootState) => state.authReducer);
 
   const getStatusColor = (isVerified: boolean) => {
     return isVerified ? Colors.SUCCESS_GREEN : Colors.RED_ERROR;
   };
-
+  const { t } = useTranslation();
   const handleRoleChange = async (newRole: string) => {
     try {
-
       onRoleChange?.(newRole);
-
 
       await dispatch(updateRole(newRole) as any).unwrap();
       Toast.show({
         type: 'success',
         text1: `Role changed to ${newRole} successfully!`,
       });
-
-      // Alert.alert('Success', `Role changed to ${newRole} successfully!`);
     } catch (error: any) {
 
       Toast.show({
         type: 'error',
         text1: error || 'Failed to update role. Please try again.',
       });
-      // Alert.alert('Error', error || 'Failed to update role. Please try again.');
     }
   };
 
@@ -77,9 +61,11 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
           <ActivityIndicator size="small" color={Colors.MAIN_COLOR} />
         </View>
       )}
-
+      <StatusBar
+        barStyle="dark-content"
+      />
       <LinearGradient
-        colors={[Colors.MAIN_COLOR, '#5B7BFF', '#7A9AFF']}
+        colors={[Colors.MAIN_COLOR, '#4A6CF7', '#6B8AFF', '#8BA5FF']}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
         style={styles.mainCard}
@@ -87,13 +73,19 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
         <View style={styles.headerSection}>
           <View style={styles.avatarContainer}>
             {profile?.profileImage ? (
-              <Image source={{ uri: profile.profileImage }} style={styles.avatar} />
+              <Image 
+                source={{ uri: profile.profileImage }} 
+                style={styles.avatar}
+                resizeMode="cover"
+              />
             ) : (
-              <View style={styles.avatarPlaceholder}>
-                <Text style={styles.avatarText}>
-                  {getInitials(profile?.name || 'User')}
-                </Text>
-              </View>
+              <Image
+                source={{
+                  uri: `https://ui-avatars.com/api/?name=${profile?.name}&background=ffffff`,
+                }}
+                style={styles.avatar}
+                resizeMode="cover"
+              />
             )}
             <View style={styles.verificationBadge}>
               <View
@@ -130,9 +122,6 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                   },
                 ]}
               />
-
-
-
               <View style={styles.toggleLabels}>
                 <TouchableOpacity
                   style={styles.toggleHalf}
@@ -148,7 +137,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                         : styles.toggleTextInactive,
                     ]}
                   >
-                    Tasker
+                    {t('profile.tasker')}
                   </Text>
                 </TouchableOpacity>
 
@@ -166,7 +155,7 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
                         : styles.toggleTextInactive,
                     ]}
                   >
-                    Poster
+                    {t('profile.poster')}
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -177,189 +166,161 @@ const ProfileCard: React.FC<ProfileCardProps> = ({
 
       <View style={styles.infoCard}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Contact Information</Text>
+            <Text style={styles.cardTitle}>{t('profile.contactInformation')}</Text>
           {/* <View style={styles.cardIcon}>📧</View> */}
         </View>
+        <InfoRow
+          label={t('profile.email')}
+          value={profile?.email || 'Not provided'}
+        />
 
-        <View style={styles.infoRow}>
-          {/* <View style={styles.infoIcon}>📧</View> */}
-          <View style={styles.infoContent}>
-            <Text style={styles.infoLabel}>Email</Text>
-            <Text style={styles.infoValue}>{profile?.email || 'Not provided'}</Text>
-          </View>
-        </View>
+        <InfoRow
+          label={t('profile.phone')}
+          value={profile.phone}
+        />
 
-        {profile?.phone && (
-          <View style={styles.infoRow}>
-            {/* <View style={styles.infoIcon}>📞</View> */}
-            <View style={styles.infoContent}>
-              <Text style={styles.infoLabel}>Phone</Text>
-              <Text style={styles.infoValue}>{profile.phone}</Text>
-            </View>
-          </View>
-        )}
-
-        <View style={styles.infoRow}>
-          {/* <View style={styles.infoIcon}>🆔</View> */}
-          <View style={styles.infoContent}>
-            <Text style={styles.infoLabel}>Aadhaar</Text>
-            <Text style={styles.infoValue}>
-              {profile?.aadharNumber || profile?.adharcard_number || 'Not provided'}
-            </Text>
-          </View>
-        </View>
+        <InfoRow
+          label={t('profile.aadharNumber')}
+          value={profile?.aadharNumber || profile?.adharcard_number || 'Not provided'}
+        />
       </View>
 
-      {/* Address Information Card */}
       <View style={styles.infoCard}>
         <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Address</Text>
+          <Text style={styles.cardTitle}>{t('profile.address')}</Text>
           {/* <View style={styles.cardIcon}>📍</View> */}
         </View>
-
-        <View style={styles.infoRow}>
-          {/* <View style={styles.infoIcon}>🏠</View> */}
-          <View style={styles.infoContent}>
-            <Text style={styles.infoLabel}>Address Line</Text>
-            <Text style={styles.infoValue}>
-              {profile?.permanent_address?.addressLine || 'Not provided'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.infoRow}>
-          {/* <View style={styles.infoIcon}>🏘️</View> */}
-          <View style={styles.infoContent}>
-            <Text style={styles.infoLabel}>Street</Text>
-            <Text style={styles.infoValue}>
-              {profile?.permanent_address?.street || 'Not provided'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.infoRow}>
-          {/* <View style={styles.infoIcon}>🏙️</View> */}
-          <View style={styles.infoContent}>
-            <Text style={styles.infoLabel}>City</Text>
-            <Text style={styles.infoValue}>
-              {profile?.permanent_address?.city || 'Not provided'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.infoRow}>
-          {/* <View style={styles.infoIcon}>🗺️</View> */}
-          <View style={styles.infoContent}>
-            <Text style={styles.infoLabel}>State</Text>
-            <Text style={styles.infoValue}>
-              {profile?.permanent_address?.state || 'Not provided'}
-            </Text>
-          </View>
-        </View>
-
-        <View style={styles.infoRow}>
-          {/* <View style={styles.infoIcon}>📮</View> */}
-          <View style={styles.infoContent}>
-            <Text style={styles.infoLabel}>Pincode</Text>
-            <Text style={styles.infoValue}>
-              {profile?.permanent_address?.pincode || 'Not provided'}
-            </Text>
-          </View>
-        </View>
+        <InfoRow
+          label={t('profile.addressLine')}
+          value={profile?.permanent_address?.addressLine || 'Not provided'}
+        />
+        <InfoRow
+          label={t('profile.street')}
+          value={profile?.permanent_address?.street || 'Not provided'}
+        />
+        <InfoRow
+          label={t('profile.city')}
+          value={profile?.permanent_address?.city || 'Not provided'}
+        />
+        <InfoRow
+            label={t('profile.state')}
+          value={profile?.permanent_address?.state || 'Not provided'}
+        />
+        {/* <InfoRow
+          label="Pincode"
+          value={profile?.permanent_address?.pincode || 'Not provided'}
+        /> */}
       </View>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+export const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 16,
-    paddingTop: 16,
+    paddingHorizontal: metrics.paddingHorizontal(16),
+    paddingTop: metrics.paddingTop(16),
   },
   mainCard: {
-    borderRadius: 24,
-    padding: 24,
-    marginBottom: 20,
+    borderRadius: metrics.borderRadius(28),
+    padding: metrics.padding(24),
+    marginBottom: metrics.marginBottom(24),
     shadowColor: Colors.MAIN_COLOR,
-    shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.3,
-    shadowRadius: 16,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 12 },
+    shadowOpacity: 0.4,
+    shadowRadius: 20,
+    elevation: 12,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.2)',
+    position: 'relative',
+    overflow: 'hidden',
   },
   headerSection: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 20,
+    // marginBottom: metrics.marginBottom(20),
   },
   avatarContainer: {
     position: 'relative',
-    marginRight: 16,
-  },
-  avatar: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.4)',
-  },
-  avatarPlaceholder: {
-    width: 72,
-    height: 72,
-    borderRadius: 36,
-    backgroundColor: 'rgba(255,255,255,0.9)',
+    marginRight: metrics.marginRight(16),
     justifyContent: 'center',
     alignItems: 'center',
-    borderWidth: 3,
-    borderColor: 'rgba(255,255,255,0.4)',
+    overflow: 'hidden',
+  },
+  avatar: {
+      width: metrics.width(48),
+    height: metrics.height(48),
+    borderRadius: metrics.width(48) / 2,
+    backgroundColor: Colors.WHITE,
+    borderWidth: metrics.borderWidth(1),
+    borderColor: 'rgba(255,255,255,0.6)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 8,
+    elevation: 6,
   },
   avatarText: {
-    fontSize: 24,
+    fontSize: metrics.fontSize(20),
     fontWeight: '600',
     color: Colors.MAIN_COLOR,
   },
   verificationBadge: {
     position: 'absolute',
-    bottom: -2,
-    right: -2,
-    borderRadius: 10,
-    padding: 4,
+    bottom: metrics.bottom(-2),
+    right: metrics.right(-2),
+    borderRadius: metrics.borderRadius(5),
+    padding: metrics.padding(4),
   },
   statusDot: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
+    width: metrics.width(12),
+    height: metrics.height(12),
+    borderRadius: metrics.width(12)/2,
+    borderWidth: metrics.borderWidth(1),
+    borderColor: Colors.LIGHT_GREY,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 3,
   },
   userInfo: {
     flex: 1,
     justifyContent: 'center',
+
   },
   userName: {
-    fontSize: 22,
-    fontWeight: '600',
+    fontSize: metrics.fontSize(24),
+    fontWeight: '700',
     color: Colors.WHITE,
-    marginBottom: 6,
+    marginBottom: metrics.marginBottom(8),
+    textShadowColor: 'rgba(0, 0, 0, 0.3)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 2,
   },
   userMeta: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 16,
+    gap: metrics.gap(16),
   },
   ratingContainer: {
     flexDirection: 'row',
     alignItems: 'center',
   },
   ratingText: {
-    marginLeft: 6,
+    marginLeft: metrics.marginLeft(6),
     color: Colors.WHITE,
-    fontSize: 14,
-    fontWeight: '500',
-    opacity: 0.9,
+    fontSize: metrics.fontSize(15),
+    fontWeight: '600',
+    opacity: 0.95,
+    textShadowColor: 'rgba(0, 0, 0, 0.2)',
+    textShadowOffset: { width: 0, height: 1 },
+    textShadowRadius: 1,
   },
   infoCard: {
     backgroundColor: Colors.WHITE,
-    borderRadius: 20,
-    padding: 20,
-    marginBottom: 16,
+    borderRadius: metrics.borderRadius(20),
+    padding: metrics.padding(20),
+    marginBottom: metrics.marginBottom(16),
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.08,
@@ -369,44 +330,18 @@ const styles = StyleSheet.create({
   cardHeader: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: metrics.marginBottom(16),
   },
   cardTitle: {
-    fontSize: 18,
+    fontSize: metrics.fontSize(18),
     fontWeight: 'bold',
     color: Colors.CHARCOAL_GRAY,
     flex: 1,
   },
   cardIcon: {
-    fontSize: 20,
+    fontSize: metrics.fontSize(20),
   },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    marginBottom: 16,
-  },
-  infoIcon: {
-    fontSize: 18,
-    marginRight: 12,
-    marginTop: 2,
-  },
-  infoContent: {
-    flex: 1,
-  },
-  infoLabel: {
-    fontSize: 12,
-    color: Colors.DARK_GREY,
-    marginBottom: 4,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  infoValue: {
-    fontSize: 16,
-    color: Colors.CHARCOAL_GRAY,
-    fontWeight: '500',
-    lineHeight: 22,
-  },
+
   toggleTextLeft: {
     textAlign: 'left',
   },
@@ -416,70 +351,83 @@ const styles = StyleSheet.create({
   toggleContainer: {
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 35,
-    // marginTop: 12,
+    marginBottom: metrics.marginBottom(5),
+    padding: metrics.padding(5),
   },
   toggleBackground: {
-    width: 120,
-    height: 36,
-    borderRadius: 18,
+    width: metrics.width(120),
+    height: metrics.height(30),
+    borderRadius: metrics.borderRadius(20),
     backgroundColor: Colors.MAIN_COLOR,
     position: 'relative',
     overflow: 'hidden',
+    borderWidth: 0.5,
+    borderColor: 'rgba(255, 255, 255, 0.3)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   toggleSlider: {
     position: 'absolute',
-    top: 2,
-    left: 2,
-    width: 56,
-    height: 32,
-    borderRadius: 16,
+    top: metrics.top(2),
+    left: metrics.left(3),
+    width: metrics.width(56),
+    height: metrics.height(25),
+    borderRadius: metrics.borderRadius(17),
+    padding: metrics.padding(1),
     backgroundColor: Colors.WHITE,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 4,
+    borderWidth: 0.5,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
   },
   toggleLabels: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: metrics.top(0),
+    left: metrics.left(0),
+    right: metrics.right(0),
+    bottom: metrics.bottom(0),
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
+    // paddingHorizontal: metrics.paddingHorizontal(8),
     zIndex: 1,
   },
   toggleHalf: {
     flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
-    height: '100%',
+    height: metrics.height(100),
   },
   toggleText: {
-    fontSize: 13,
+    fontSize: metrics.fontSize(14),
     fontWeight: '600',
-    letterSpacing: 0.3,
+    letterSpacing: 0.5,
+    alignItems:'center',
   },
   toggleTextActive: {
     color: Colors.MAIN_COLOR,
+   textAlign:'center',
   },
   toggleTextInactive: {
     color: Colors.WHITE,
+    textAlign:'center',
   },
   loadingOverlay: {
     position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
+    top: metrics.top(0),
+    left: metrics.left(0),
+    right: metrics.right(0),
+    bottom: metrics.bottom(0),
     backgroundColor: 'rgba(255, 255, 255, 0.8)',
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 18,
+    borderRadius: metrics.borderRadius(18),
     zIndex: 2,
   },
 });

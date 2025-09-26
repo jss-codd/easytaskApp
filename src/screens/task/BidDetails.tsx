@@ -4,13 +4,12 @@ import {
   Text,
   ScrollView,
   ActivityIndicator,
-  TouchableOpacity,
   StatusBar,
   Image,
 } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import Header from '../layout/Header';
-import { archiveTask, getAllTaskById, getTaskById } from '../../service/apiService';
+import { archiveTask, getTaskById } from '../../service/apiService';
 import { formatCurrency, formatDate2, getBidRange, timeAgo } from '../../utils/helper';
 import styles from './bidDetails';
 import {
@@ -18,10 +17,8 @@ import {
   InfoRow,
   Rating,
   Section,
-  Checkbox,
 } from '../../components/CustomComponents';
 import LocationIcon from '../../Icons/LocationIcon';
-import { SaveIcon, UnsaveIcon } from '../../Icons/SaveIcon';
 import Colors from '../../constants/color';
 import metrics from '../../constants/metrics';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -29,26 +26,28 @@ import EditIcon from '../../Icons/EditIcon';
 import ArchiveIcon from '../../Icons/ArchiveIcon';
 import { ImageUrl } from '../../service/axiosInterceptor';
 import { Toast } from '../../components/CommonToast';
+import { AxiosErrorMessage } from '../../utils/type';
+import { useTranslation } from 'react-i18next';
 
 const BidDetails = () => {
+  const { t } = useTranslation();
+
   const route = useRoute();
   const { task } = route.params as { task: any };
   const navigation = useNavigation<any>();
   const isEditing = !!task;
+
   const [ownerDetails, setOwnerDetails] = useState<any>(null);
   const [taskDetails, setTaskDetails] = useState<any>(null);
   const [loading, setLoading] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
-  console.log('task', task);
-  const fetchTaskDetails = async () => {
+
+  const fetchTaskDetails = async (id: string) => {
     try {
       setLoading(true);
       const taskDetails = await getTaskById(task.id);
-      console.log('taskDetails', taskDetails);
       setTaskDetails(taskDetails);
       setOwnerDetails(taskDetails.ownerStats);
     } catch (error) {
-      console.error('Error fetching task details:', error);
       Toast.show({
         type: 'error',
         text1: 'Error',
@@ -60,21 +59,25 @@ const BidDetails = () => {
   };
 
   useEffect(() => {
-    fetchTaskDetails();
-  }, [task.id]);
+    fetchTaskDetails(task.id);
+  }, [task.id,taskDetails?.archived]);
 
-  const handleArchiveTask = async (id: string) => {
-    console.log('id', id);
+  const handleArchiveTask = async (id: string,isArchived: boolean) => {
+    const payload = { archived: !isArchived };
     try {
-      const response = await archiveTask(id, { archived: true });
-      console.log('response', response);
+      const response = await archiveTask(id, payload);
       Toast.show({
         type: 'success',
-        text1: 'Task archived successfully',
+        text1: 'Task ' + (isArchived ? 'unarchived' : 'archived') + ' successfully',
       });
-      navigation.goBack();
+      fetchTaskDetails(id);
+      // navigation.goBack();
     } catch (error) {
-      console.error('Error archiving task:', error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error archiving task',
+        text2: (error as AxiosErrorMessage).response?.data?.message as string,
+      });
     }
   };
   return (
@@ -86,7 +89,7 @@ const BidDetails = () => {
         }}
       >
         <StatusBar backgroundColor={Colors.MAIN_COLOR} barStyle="dark-content" />
-        <Header title="Bid Details" showBack={true} />
+        <Header title={t('bid.allBids')} showBack={true} />
         <ScrollView
           contentContainerStyle={{ flexGrow: 1 }}
           showsVerticalScrollIndicator={false}
@@ -106,12 +109,11 @@ const BidDetails = () => {
               <View style={styles.headerRow}>
                 <Text style={styles.title}>{task?.title}</Text>
                 <View style={styles.iconContainer}>
-                  {/* <Rating stars={task?.owner?.profile.rating || 0} /> */}
 
-                  <EditIcon size={25} color={Colors.LINK_COLOR} onPress={() => { navigation.navigate('PostTask', { bid: task, isEditing: isEditing }) }} />
-                  <ArchiveIcon size={25} color={Colors.DARK_GREY} disabled={task?.archived || task?._count?.bids > 0} onPress={() => { handleArchiveTask(task.id) }} />
+
+                  <EditIcon size={25} color={task?._count?.bids > 0 ? Colors.DARK_GREY : Colors.LINK_COLOR} disabled={task?._count?.bids > 0} onPress={() => { navigation.navigate('PostTask', { bid: task, isEditing: isEditing }) }} />
+                  <ArchiveIcon size={25} color={taskDetails?.task?.archived ? Colors.DARK_GREY : Colors.SUCCESS_GREEN} disabled={task?._count?.bids > 0} onPress={() => { handleArchiveTask(task.id,taskDetails?.task?.archived) }} />
                 </View>
-                {/* <Rating stars={task?.owner?.profile.rating || 0} /> */}
               </View>
               <Rating stars={task?.owner?.profile.rating || 0} />
               <View style={styles.verifiedRow}>
@@ -119,7 +121,6 @@ const BidDetails = () => {
                 <Text style={styles.verifiedText}>Payment verified</Text>
               </View>
 
-              {/* Location */}
               <View style={styles.locationRow}>
                 <LocationIcon size={15} color={Colors.DARK_GREY} />
                 <Text style={styles.textMuted}>
@@ -127,14 +128,12 @@ const BidDetails = () => {
                 </Text>
               </View>
 
-              {/* Description */}
               <View style={styles.divider} />
               <Section
                 title="Discription"
                 value={task?.description?.replace(/<[^>]+>/g, '')}
               />
 
-              {/* Job Details */}
               <View style={styles.divider} />
               <InfoRow
                 label="Budget"
@@ -151,7 +150,7 @@ const BidDetails = () => {
                 value={`${task?.media?.length} files`}
               />
               {task?.media && task.media.length > 0 && (
-                <View>
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap' }}>
                   {task.media.map((item: any, index: any) => (
 
                     <Image
@@ -164,7 +163,6 @@ const BidDetails = () => {
                 </View>
               )}
 
-              {/* Job Categories */}
               <View style={styles.divider} />
               <Text style={styles.textBold}>Job Category</Text>
               <View
@@ -184,17 +182,14 @@ const BidDetails = () => {
                 ))}
               </View>
               <View style={styles.divider} />
-              {/* Activity Section */}
               <View style={styles.activitySection}>
                 <Text style={styles.activityTitle}>Bids on this Task</Text>
                 <View style={styles.activityRow}>
                   <Text style={styles.activityLabel}>Bids</Text>
-                  <Text style={styles.activityValue}>{getBidRange(Number(task._count.bids))}</Text>
+                  <Text style={styles.activityValue}>{getBidRange(Number(task?._count?.bids))}</Text>
                 </View>
               </View>
 
-
-              {/* Tasker's List */}
               <View style={styles.divider} />
               <Section title="Tasker's List" value={''} />
               <View style={{ flex: 1, padding: 10 }}>
@@ -247,32 +242,6 @@ const BidDetails = () => {
                   </Text>
                 )}
               </View>
-
-              {/* Action Buttons */}
-              {/* <View style={styles.buttonContainer}>
-              <TouchableOpacity
-                style={styles.button}
-                onPress={() => {
-                  console.log('Apply now');
-                }}
-              >
-                <Text style={styles.buttonText}>Apply now</Text>
-              </TouchableOpacity>
-              <TouchableOpacity
-                style={styles.iconButton}
-                onPress={() => {
-                  setIsSaved(!isSaved);
-                  console.log('save task');
-                }}
-              >
-                {isSaved ? (
-                  <SaveIcon size={20} color={Colors.MAIN_COLOR} />
-                ) : (
-                  <UnsaveIcon size={20} color={Colors.MAIN_COLOR} />
-                )}
-                <Text style={styles.saveButtonText}>Save job</Text>
-              </TouchableOpacity>
-            </View> */}
             </View>
           )}
         </ScrollView>

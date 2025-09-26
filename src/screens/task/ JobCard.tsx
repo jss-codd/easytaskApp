@@ -8,6 +8,7 @@ import { UnsaveIcon, SaveIcon } from '../../Icons/SaveIcon';
 import { Chip, Rating, VerifiedBadge } from '../../components/CustomComponents';
 import { getBidRange } from '../../utils/helper';
 import { UserRole } from '../../utils/enums';
+import FONT_FAMILY from '../../constants/FontFamily';
 
 interface JobCardProps {
   title: string;
@@ -26,7 +27,7 @@ interface JobCardProps {
   role?: string;
 }
 
-const JobCard: React.FC<JobCardProps> = ({
+const JobCard = ({
   title,
   description,
   budget,
@@ -41,7 +42,7 @@ const JobCard: React.FC<JobCardProps> = ({
   selectedCategories,
   isSaved,
   role,
-}) => {
+}: JobCardProps) => {
   const [expanded, setExpanded] = useState(false);
 
   const toggleDescription = () => setExpanded(prev => !prev);
@@ -69,11 +70,11 @@ const JobCard: React.FC<JobCardProps> = ({
       <View style={[styles.row, { flex: 1 }]}>
         <LocationIcon color="gray" size={15} />
         <Text style={styles.locationText}>
-          {location.street}, {location.city}
+          {location.city}, {location.state}
         </Text>
       </View>
 
-      <View style={[styles.row]}>
+      <View style={[styles.badgeRow]}>
         <Text style={styles.budget}>
           <Text style={{ fontWeight: '500' }}>Budget : {budget} </Text>
         </Text>
@@ -150,15 +151,16 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
   },
   title: {
-    fontSize: metrics.fontSize(16),
+    fontSize: metrics.fontSize(14),
     fontWeight: 'bold',
     color: '#000',
     textTransform: 'capitalize',
     flex: 1,
+    // fontFamily:FONT_FAMILY.EXTRA_BOLD
   },
   postedTime: {
     color: Colors.LINK_COLOR,
-    fontSize: metrics.fontSize(11),
+    fontSize: metrics.fontSize(10),
   },
   row: {
     flexDirection: 'row',
@@ -167,17 +169,17 @@ const styles = StyleSheet.create({
   },
   verifiedText: {
     color: 'green',
-    fontSize: metrics.fontSize(11),
+    fontSize: metrics.fontSize(10),
   },
   locationText: {
-    fontSize: metrics.fontSize(11),
+    fontSize: metrics.fontSize(10),
     color: Colors.DARK_GREY,
     marginLeft: metrics.marginLeft(3),
     flexShrink: 1,
   },
   budget: {
     marginTop: metrics.marginTop(6),
-    fontSize: metrics.fontSize(11),
+    fontSize: metrics.fontSize(10),
     color: Colors.DARK_GREY,
   },
   description: {
@@ -223,12 +225,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: metrics.paddingHorizontal(1),
     paddingVertical: metrics.paddingVertical(2),
     borderRadius: metrics.borderRadius(12),
-    // marginBottom: metrics.marginBottom(10),
     alignItems: 'center',
     width: metrics.width(70),
     flexDirection: 'row',
-    justifyContent: 'center',
-    // flex: 1,
   },
   appliedBadgeText: {
     textAlign: 'center',
@@ -236,5 +235,9 @@ const styles = StyleSheet.create({
     color: Colors.DARK_GREY,
     fontWeight: '500',
     fontSize: metrics.fontSize(11),
+  },
+  badgeRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
   },
 });

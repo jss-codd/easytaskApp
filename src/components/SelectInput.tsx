@@ -17,12 +17,12 @@ type SelectInputProps = {
   options: Option[];
 };
 
-const SelectInput: React.FC<SelectInputProps> = ({
+const SelectInput = ({
   name,
   label,
   height,
   options,
-}) => {
+}: SelectInputProps) => {
   //   const [field, meta, helpers] = useField<string | number>(name);
 
   return (

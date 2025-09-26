@@ -5,6 +5,7 @@ import { loginStyles } from '../style';
 import CustomPasswordInput from '../../../components/CustomPasswordInput';
 import metrics from '../../../constants/metrics';
 import Colors from '../../../constants/color';
+import { useTranslation } from 'react-i18next';
 
 const PersonalDetails = ({
   values,
@@ -12,12 +13,12 @@ const PersonalDetails = ({
   errors,
   touched,
   handleBlur,
-  setFieldValue,
   step,
   goNext,
   goBack,
   loading,
 }: any) => {
+  const { t } = useTranslation();
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -30,21 +31,17 @@ const PersonalDetails = ({
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.card}>
-            <Text style={loginStyles.title}>Personal Information</Text>
-            {/* <Text style={styles.subtitle}>Fill in your basic details</Text> */}
-
-            <CustomTextInput
-              placeholder="Enter your name"
+              <Text style={loginStyles.title}>{t('auth.personalInformation')}</Text>
+              <CustomTextInput
+              placeholder={t('auth.enterYourName')}
               value={values.name}
               onChangeText={handleChange('name')}
               onBlur={() => handleBlur('name')}
               error={errors.name}
               touched={touched.name}
-            // label="Name"
             />
-
             <CustomTextInput
-              placeholder="Enter your email"
+              placeholder={t('auth.enterYourEmail')}
               value={values.email}
               onChangeText={handleChange('email')}
               onBlur={() => handleBlur('email')}
@@ -54,9 +51,8 @@ const PersonalDetails = ({
               error={errors.email}
               touched={touched.email}
             />
-
             <CustomTextInput
-              placeholder="Enter your phone"
+              placeholder={t('auth.enterYourPhoneNumber')}
               value={values.phone}
               onChangeText={handleChange('phone')}
               onBlur={() => handleBlur('phone')}
@@ -66,53 +62,29 @@ const PersonalDetails = ({
               error={errors.phone}
               touched={touched.phone}
             />
-
             <CustomPasswordInput
-              placeholder="Enter your password"
+              placeholder={t('auth.enterYourPassword')}
               value={values.password}
               onChangeText={handleChange('password')}
               onBlur={() => handleBlur('password')}
               error={errors.password}
               touched={touched.password}
             />
-
             <CustomPasswordInput
-              placeholder="Confirm your password"
+              placeholder={t('auth.confirmPassword')}
               value={values.confirmPassword}
               onChangeText={handleChange('confirmPassword')}
               onBlur={() => handleBlur('confirmPassword')}
               error={errors.confirmPassword}
               touched={touched.confirmPassword}
             />
-
-            {/* <CustomTextInput
-        placeholder="Enter your password"
-        secureTextEntry
-        value={values.password}
-        onChangeText={handleChange('password')}
-        onBlur={() => handleBlur('password')}
-        error={errors.password}
-        touched={touched.password}
-        autoCapitalize="none"
-      />
-
-      <CustomTextInput
-        placeholder="Confirm your password"
-        secureTextEntry
-        value={values.confirmPassword}
-        onChangeText={handleChange('confirmPassword')}
-        onBlur={() => handleBlur('confirmPassword')}
-        error={errors.confirmPassword}
-        touched={touched.confirmPassword}
-        autoCapitalize="none"
-      /> */}
             <View style={styles.buttonContainer}>
               {step > 0 && (
                 <TouchableOpacity
                   style={styles.backButton}
                   onPress={goBack}
                 >
-                  <Text style={styles.buttonText}>Back</Text>
+                  <Text style={styles.buttonText}>{t('common.back')}</Text>
                 </TouchableOpacity>
               )}
 
@@ -121,7 +93,7 @@ const PersonalDetails = ({
                 onPress={goNext}
               >
                 <Text style={styles.buttonText}>
-                  {loading ? 'Verifying...' : 'Signed Up & Verify'}
+                  {loading ? t('auth.verifying') : t('auth.signedUpAndVerify')}
                 </Text>
               </TouchableOpacity>
             </View>
@@ -194,7 +166,7 @@ const styles = StyleSheet.create({
   backButton: {
     flex: 1,
     backgroundColor: Colors.GREY,
-   
+
     paddingVertical: metrics.paddingVertical(15),
     borderRadius: metrics.borderRadius(12),
     alignItems: 'center',

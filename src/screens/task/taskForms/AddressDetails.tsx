@@ -18,6 +18,7 @@ import SelectDropdown from '../../../components/SelectDropdown';
 import { goNextStep, stateOptions } from '../../../utils/helper';
 import Colors from '../../../constants/color';
 import { stepFields } from '../../../utils/type';
+import { useTranslation } from 'react-i18next';
 
 const AddressDetails = ({
   values,
@@ -30,6 +31,8 @@ const AddressDetails = ({
   validateForm,
   setFieldTouched,
 }: any) => {
+  const { t } = useTranslation();
+  
   const [region, setRegion] = useState({
     latitude: 28.6139,
     longitude: 77.209,
@@ -65,7 +68,7 @@ const AddressDetails = ({
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          <Text style={FormStyles.title}>Address Details</Text>
+          <Text style={FormStyles.title}>{t('task.addressDetails')}</Text>
           {/* <CustomInput
             label="Phone"
             placeholder="Phone"
@@ -77,10 +80,10 @@ const AddressDetails = ({
           <CustomInput
             label={
               <Text>
-                Address Line 1<Text style={{ color: 'red' }}>*</Text>
+                {t('task.addressLine1')}<Text style={{ color: 'red' }}>*</Text>
               </Text>
             }
-            placeholder="Address Line 1"
+            placeholder={t('task.addressLine1')}
             value={values.location.addressLine1}
             onChangeText={handleChange('location.addressLine1')}
             error={
@@ -88,8 +91,12 @@ const AddressDetails = ({
             }
           />
           <CustomInput
-            label="Address Line 2"
-            placeholder="Address Line 2"
+            label={
+              <Text>
+                {t('task.addressLine2')}
+              </Text>
+            }
+            placeholder={t('task.addressLine2')}
             value={values.location.addressLine2}
             onChangeText={handleChange('location.addressLine2')}
             error={
@@ -107,10 +114,10 @@ const AddressDetails = ({
           <CustomInput
             label={
               <Text>
-                Street<Text style={{ color: 'red' }}>*</Text>
+                {t('task.street')}<Text style={{ color: 'red' }}>*</Text>
               </Text>
             }
-            placeholder="Street"
+            placeholder={t('task.street')}
             value={values.location.street}
             onChangeText={handleChange('location.street')}
             error={touched.location?.street && errors.location?.street}
@@ -118,19 +125,19 @@ const AddressDetails = ({
           <CustomInput
             label={
               <Text>
-                City<Text style={{ color: 'red' }}>*</Text>
+                {t('task.city')}<Text style={{ color: 'red' }}>*</Text>
               </Text>
             }
-            placeholder="City"
+            placeholder={t('task.city')}
             value={values.location.city}
             onChangeText={handleChange('location.city')}
             error={touched.location?.city && errors.location?.city}
           />
 
-          <Text style={styles.subtitle}>Select State <Text style={{ color: 'red' }}>*</Text></Text>
+          <Text style={styles.subtitle}>{t('task.selectState')}<Text style={{ color: 'red' }}>*</Text></Text>
           <SelectDropdown
-            label="State"
-            placeholder="State"
+            label={t('task.state')}
+            placeholder={t('task.state')}
             value={values.location.state}
             onSelect={(selectedItem: any, index: number) => {
               setFieldValue('location.state', selectedItem.value);
@@ -170,7 +177,7 @@ const AddressDetails = ({
                 style={FormStyles.button}
                 onPress={() => setStep(step - 1)}
               >
-                <Text style={FormStyles.buttonText}>Back</Text>
+                <Text style={FormStyles.buttonText}>{t('common.back')}</Text>
               </TouchableOpacity>
             )}
             <TouchableOpacity
@@ -185,7 +192,7 @@ const AddressDetails = ({
                 )
               }
             >
-              <Text style={FormStyles.buttonText}>Next</Text>
+              <Text style={FormStyles.buttonText}>{t('common.next')}</Text>
             </TouchableOpacity>
           </View>
         </ScrollView>

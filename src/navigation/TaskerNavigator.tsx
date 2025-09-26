@@ -10,27 +10,30 @@ import MyBids from '../screens/bids/MyBids';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import TaskDetails from '../screens/task/TaskDetails';
 import ApplyTaskForm from '../screens/task/applyTaskForm/ApplyTaskForm';
+import { Screen } from '../utils/type';
+import metrics from '../constants/metrics';
+import { useTranslation } from 'react-i18next';
 
 const Stack = createNativeStackNavigator();
 
 export const BrowseJobsStack = () => (
   <Stack.Navigator>
     <Stack.Screen
-      name="BrowseJobs"
+      name={Screen.BrowseJobs}
       component={BrowseTask}
       options={{
         headerShown: false,
       }}
     />
     <Stack.Screen
-      name="TaskDetails"
+      name={Screen.TaskDetails}
       component={TaskDetails}
       options={{
         headerShown: false,
       }}
     />
     <Stack.Screen
-      name="ApplyTask"
+      name={Screen.ApplyTask}
       component={ApplyTaskForm}
       options={{
         headerShown: false,
@@ -41,12 +44,12 @@ export const BrowseJobsStack = () => (
 export const MyBidsStack = () => (
   <Stack.Navigator>
     <Stack.Screen
-      name="MyBids"
+      name={Screen.MyBids}
       component={MyBids}
       options={{ headerShown: false }}
     />
     <Stack.Screen
-      name="ApplyTask"
+      name={Screen.ApplyTask}
       component={ApplyTaskForm}
       options={{ headerShown: false }}
     />
@@ -56,31 +59,32 @@ export const MyBidsStack = () => (
 const Tab = createBottomTabNavigator();
 
 const TaskerAppNavigator = () => {
+  const {t} = useTranslation();
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
         tabBarIcon: ({ color, size }) => {
-          if (route.name === 'BrowseTasks') {
+          if (route.name === Screen.BrowseTask) {
             return <HomeIcon size={size} color={color} />;
-          } else if (route.name === 'MyBids') {
+          } else if (route.name === Screen.Bids) {
             return <JobIcon size={size} color={color} />;
-          } else if (route.name === 'Profile') {
+          } else if (route.name === Screen.Profile) {
             return <UserIcon size={size} color={color} />;
-          } else if (route.name === 'Chat') {
+          } else if (route.name === Screen.Chat) {
             return <ChatIcon size={size} color={color} />;
           }
           return null;
         },
         tabBarActiveTintColor: Colors.MAIN_COLOR,
         tabBarInactiveTintColor: 'gray',
-        tabBarLabelStyle: { fontSize: 12, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: metrics.fontSize(12), fontWeight: '600' },
         headerShown: false,
       })}
     >
-      <Tab.Screen name="BrowseTasks" component={BrowseJobsStack} />
-      <Tab.Screen name="MyBids" component={MyBidsStack} />
-      <Tab.Screen name="Chat" component={ChatListStack} />
-      <Tab.Screen name="Profile" component={ProfileDrawer} />
+      <Tab.Screen name={Screen.BrowseTask} component={BrowseJobsStack} options={{ title: t('navigation.browseTasks') }} />
+      <Tab.Screen name={Screen.Bids} component={MyBidsStack} options={{ title: t('navigation.myBids') }} />
+      <Tab.Screen name={Screen.Chat} component={ChatListStack} options={{ title: t('navigation.message') }} />
+      <Tab.Screen name={Screen.Profile} component={ProfileDrawer} options={{ title: t('navigation.profile') }} />
     </Tab.Navigator>
   );
 };

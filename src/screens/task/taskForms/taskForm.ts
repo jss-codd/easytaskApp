@@ -1,6 +1,7 @@
 import { StyleSheet } from 'react-native';
 import Colors from '../../../constants/color';
 import metrics from '../../../constants/metrics';
+import FONT_FAMILY from '../../../constants/FontFamily';
 
 const FormStyles = StyleSheet.create({
   scrollContainer: {
@@ -8,7 +9,6 @@ const FormStyles = StyleSheet.create({
     // backgroundColor: Colors.BACKGROUND,
     borderRadius: metrics.borderRadius(10),
     // paddingBottom: metrics.paddingBottom(40),
-   
   },
   container: {
     flex: 1,
@@ -21,7 +21,7 @@ const FormStyles = StyleSheet.create({
     fontSize: metrics.fontSize(18),
     fontWeight: '600',
     marginBottom: metrics.marginBottom(16),
-    textAlign: 'center',
+    textAlign: 'center',  
   },
   row: {
     flexDirection: 'row',
@@ -38,5 +38,11 @@ const FormStyles = StyleSheet.create({
     alignItems: 'center',
   },
   buttonText: { color: '#fff', fontWeight: 'bold' },
+  error: {
+    color: Colors.RED_ERROR,
+    fontSize: metrics.fontSize(12),
+    marginTop: metrics.marginTop(5),
+  },
 });
+
 export default FormStyles;

@@ -5,12 +5,14 @@ import { loginStyles } from '../style';
 import { useNavigation } from '@react-navigation/native';
 import { roles } from '../../../utils/helper';
 import metrics from '../../../constants/metrics';
+import { useTranslation } from 'react-i18next';
 
 const RoleDetails = ({ values, errors, touched, handleChange, step, goNext, goBack, loading }: any) => {
   const navigation = useNavigation<any>();
+  const { t } = useTranslation();
   return (
     <View style={styles.container}>
-      <Text style={loginStyles.title}>Choose Your Role</Text>
+      <Text style={loginStyles.title}>{t('auth.selectYourRole')}</Text>
 
       <View style={styles.roleContainer}>
         {roles.map(role => (
@@ -30,14 +32,6 @@ const RoleDetails = ({ values, errors, touched, handleChange, step, goNext, goBa
             >
               {role.label}
             </Text>
-            {/* <Text
-              style={[
-                styles.roleDescription,
-                values.role === role.key && styles.selectedRoleDescription,
-              ]}
-            >
-              {role.description}
-            </Text> */}
           </TouchableOpacity>
         ))}
       </View>
@@ -48,9 +42,9 @@ const RoleDetails = ({ values, errors, touched, handleChange, step, goNext, goBa
 
 
       <View style={loginStyles.footer}>
-        <Text style={loginStyles.footerText}>Already have an account? </Text>
+        <Text style={loginStyles.footerText}>{t('auth.alreadyHaveAccount')}</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Login')}>
-          <Text style={loginStyles.signupLink}>Login</Text>
+          <Text style={loginStyles.signupLink}>{t('auth.login')}</Text>
         </TouchableOpacity>
       </View>
 
@@ -60,7 +54,7 @@ const RoleDetails = ({ values, errors, touched, handleChange, step, goNext, goBa
           style={styles.nextButton}
           onPress={goNext}
         >
-            <Text style={styles.buttonText}>Next</Text>
+            <Text style={styles.buttonText}>{t('common.next')}</Text>
           </TouchableOpacity>
         )}
       </View>

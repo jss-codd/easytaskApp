@@ -1,5 +1,8 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, Text, TouchableOpacity, View, Modal, TextInput, Dimensions } from 'react-native';
 import styles from '../screens/task/bidDetails';
+import Colors from '../constants/color';
+import { LinearGradient } from 'react-native-linear-gradient';
+import metrics from '../constants/metrics';
 
 export const InfoRow = ({
   label,
@@ -65,3 +68,32 @@ export const Checkbox = ({ selected, onPress, disabled }: { selected: boolean; o
     {selected && <View style={styles.checkboxSelected} />}
   </TouchableOpacity>
 );
+
+export const Card = ({ children }: { children: React.ReactNode }) => (
+  <LinearGradient
+    colors={[Colors.MAIN_COLOR, '#4A6CF7', '#6B8AFF', '#8BA5FF']}
+    start={{ x: 0, y: 0 }}
+    end={{ x: 1, y: 1 }}
+    style={styles.mainCard}
+  >
+    <View style={styles.headerSection}>
+      {children}
+    </View>
+  </LinearGradient>
+);
+
+export interface DynamicModalProps {
+  visible: boolean;
+  onClose: () => void;
+  title: string;
+  placeholder?: string;
+  value?: string;
+  onChangeText?: (text: string) => void;
+  leftButtonText?: string;
+  rightButtonText?: string;
+  onLeftButtonPress?: () => void;
+  onRightButtonPress?: () => void;
+  multiline?: boolean;
+  numberOfLines?: number;
+  isInput?: boolean;
+}

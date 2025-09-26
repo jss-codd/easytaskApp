@@ -9,6 +9,7 @@ import {
     ScrollView,
     View,
     TouchableOpacity,
+    ActivityIndicator,
 } from 'react-native';
 import FormStyles from './taskForm';
 import { fetchCategories } from '../../../store/slices/jobCategoriesSlice';
@@ -22,6 +23,7 @@ import { goNextStep } from '../../../utils/helper';
 import { stepFields } from '../../../utils/type';
 import { Checkbox } from '../../../components/CustomComponents';
 import { ArrowDown } from '../../../Icons/BackIcon';
+import { useTranslation } from 'react-i18next';
 
 interface Category {
     id: string | number;
@@ -47,10 +49,9 @@ const CategorySelectionForm = ({
     validateForm,
     setFieldTouched,
 }: any) => {
-    console.log('values', errors,
-        touched,);
+    const { t } = useTranslation();
     const dispatch = useAppDispatch();
-    const { categories } = useSelector((state: RootState) => state.categoriesReducer);
+    const { categories, loading } = useSelector((state: RootState) => state.categoriesReducer);
 
     const [expandedCategories, setExpandedCategories] = useState<Set<string | number>>(new Set());
     const [categoriesWithSubcategories, setCategoriesWithSubcategories] = useState<Category[]>([]);
@@ -172,10 +173,10 @@ const CategorySelectionForm = ({
         <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={FormStyles.container}>
             <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
                 <ScrollView contentContainerStyle={FormStyles.scrollContainer} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
-                    <Text style={FormStyles.title}>Select Category </Text>
+                    <Text style={FormStyles.title}>{t('task.selectCategory')}</Text>
 
                     <View style={styles.categoryContainer}>
-                        {categoriesWithSubcategories.map((category) => {
+                        {loading ? <ActivityIndicator size="large" color={Colors.MAIN_COLOR} /> : categoriesWithSubcategories.map((category) => {
                             const isExpanded = expandedCategories.has(category.id);
                             const isCategorySelected = selectedCategories.has(category.id);
 
@@ -196,11 +197,9 @@ const CategorySelectionForm = ({
                                         <ArrowDown />
                                     </TouchableOpacity>
 
-                                    {/* Subcategories */}
-
                                     {isExpanded && category.subcategories && category.subcategories.length > 0 && (
                                         <View style={styles.subcategoriesContainer}>
-                                            <Text style={styles.subcategoriesTitle}>Sub-categories</Text>
+                                            <Text style={styles.subcategoriesTitle}>{t('task.subCategories')}</Text>
                                             {category.subcategories?.map((subcategory) => {
                                                 const isSubcategorySelected = selectedSubcategories.has(subcategory.id);
                                                 const isCategorySelected = selectedCategories.has(category.id);
@@ -249,7 +248,7 @@ const CategorySelectionForm = ({
                     <View style={FormStyles.row}>
                         {step > 0 && (
                             <TouchableOpacity style={FormStyles.button} onPress={() => setStep(step - 1)}>
-                                <Text style={FormStyles.buttonText}>Back</Text>
+                                <Text style={FormStyles.buttonText}>{t('common.back')}</Text>
                             </TouchableOpacity>
                         )}
                         <TouchableOpacity style={FormStyles.button} onPress={() => goNextStep(
@@ -259,7 +258,7 @@ const CategorySelectionForm = ({
                             validateForm,
                             setFieldTouched,
                         )}>
-                            <Text style={FormStyles.buttonText}>Next</Text>
+                            <Text style={FormStyles.buttonText}>{t('common.next')}</Text>
                         </TouchableOpacity>
                     </View>
                 </ScrollView>

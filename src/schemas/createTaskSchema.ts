@@ -31,6 +31,16 @@ export const validationSchema = Yup.object().shape({
     .min(3, 'Street cannot be less than 3 characters'),
     state: Yup.string().required('State is required'),
     addressLine2: Yup.string().notRequired(),
+    media: Yup.array().of(Yup.string()).notRequired()
+    .test('file-type', 'File must be a Image', (value: any) => {
+      if (!value) return true;
+      return value.type === 'image/jpeg' || value.type === 'image/png' || value.type === 'image/jpg';
+    })
+    .test('file-size', 'File size must be less than 5MB', (value: any) => {
+      if (!value) return true;
+
+      return value.size <1* 1024 * 1024; // 1MB in bytes
+    }),
     
   }),
 });

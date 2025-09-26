@@ -3,8 +3,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import {
   ActivityIndicator,
   TouchableOpacity,
-  Modal,
-  Pressable,
   View,
   StatusBar,
 } from 'react-native';
@@ -14,7 +12,7 @@ import { NavigationProp } from '@react-navigation/native';
 import { useAppDispatch } from '../../store/store';
 import { useNavigation } from '@react-navigation/native';
 import { timeAgo } from '../../utils/helper';
-import { fetchBrowseTasks, fetchTasks } from '../../store/slices/taskSlice';
+import { fetchBrowseTasks } from '../../store/slices/taskSlice';
 import JobCard from './ JobCard';
 import { formatCurrency } from '../../utils/helper';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
@@ -27,43 +25,56 @@ import SearchInput from '../../components/SearchInput';
 import { saveTasks, unsaveTasks } from '../../service/apiService';
 import MenuIcon from '../../Icons/MenuIcon';
 import { Toast } from '../../components/CommonToast';
+import { useFilterDrawer } from '../../hooks/useFilterDrawer';
+import FilterDrawer from '../../components/FilterDrawer';
+import { filterSections } from '../../utils/helper';
+import { useTranslation } from 'react-i18next';
 
 const BrowseTask = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('newest');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
-  const [filterModalVisible, setFilterModalVisible] = useState(false);
+  
+  const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigation = useNavigation<NavigationProp<any>>();
+  const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
+
+  const handleApplyFilters = useCallback((filters: Record<string, any>) => {
+
+    setAppliedFilters(filters);
+    // Apply filters to the browse task fetch
+    dispatch(fetchBrowseTasks({ 
+      search: debouncedSearchTerm,
+      categories: filters.categories ? filters.categories.join(',') : '',
+      fixedPrice: filters.fixedPrice || ''
+    }));
+  }, [dispatch, debouncedSearchTerm]);
+
+  const handleResetFilters = useCallback(() => {
+
+    setAppliedFilters({});
+    dispatch(fetchBrowseTasks({ search: debouncedSearchTerm }));
+  }, [dispatch, debouncedSearchTerm]);
+
+  const {
+    isVisible,
+    openDrawer,
+    closeDrawer,
+    handleApply,
+    handleReset,
+    activeFilterCount,
+  } = useFilterDrawer({
+    sections: filterSections,
+    onApply: handleApplyFilters,
+    onReset: handleResetFilters,
+  });
+
   const { loading, error, browseTasks } = useAppSelector(
     state => state.taskReducer,
   );
   const { user } = useAppSelector((state: any) => state.authReducer);
-  // console.log(browseTasks)
-
-  const handleSave = async (id: string) => {
-
-    if (isSaved) {
-      const response = await unsaveTasks(id);
-      console.log('response', response);
-      Toast.show({
-        type: 'success',
-        text1: 'Task unsaved successfully',
-      });
-      setIsSaved(false);
-      dispatch(fetchBrowseTasks({ search: debouncedSearchTerm, userId: user?.id }));
-    } else {
-      await saveTasks(id);
-      Toast.show({
-        type: 'success',
-        text1: 'Task saved successfully',
-      });
-      setIsSaved(true);
-      dispatch(fetchBrowseTasks({ search: debouncedSearchTerm, userId: user?.id }));
-    }
-  };
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -75,12 +86,30 @@ const BrowseTask = () => {
   useFocusEffect(
     useCallback(() => {
       dispatch(fetchBrowseTasks({ search: debouncedSearchTerm, userId: user?.id }));
-    }, [debouncedSearchTerm, user?.id]),
+    }, [debouncedSearchTerm, user?.id, isSaved]),
   );
 
   useEffect(() => {
     dispatch(fetchBrowseTasks({ search: debouncedSearchTerm, userId: user?.id }));
-  }, [debouncedSearchTerm, user?.id]);
+  }, [debouncedSearchTerm, user?.id, isSaved]);
+
+  const handleSave = async (id: string) => {
+    if (isSaved) {
+      const response = await unsaveTasks(id);
+      Toast.show({
+        type: 'success',
+        text1: 'Task unsaved successfully',
+      });
+      setIsSaved(false);
+    } else {
+      await saveTasks(id);
+      Toast.show({
+        type: 'success',
+        text1: 'Task saved successfully',
+      });
+      setIsSaved(true);
+    }
+  };
 
   const renderItem = ({ item }: any) => (
     <JobCard
@@ -108,25 +137,33 @@ const BrowseTask = () => {
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
         <StatusBar backgroundColor={Colors.MAIN_COLOR} barStyle="dark-content" />
-        <Header title="Browse Tasks" />
-
+        <Header title={t('navigation.browseTasks')} />
         <View style={styles.filterRow}>
           <TouchableOpacity
             style={styles.iconBtn}
-            onPress={() => setFilterModalVisible(true)}
+            onPress={openDrawer}
           >
             <MenuIcon size={22} color={Colors.GREY} />
           </TouchableOpacity>
+          <FilterDrawer
+            visible={isVisible}
+            onClose={closeDrawer}
+            onApply={handleApply}
+            onReset={handleReset}
+            sections={filterSections}
+            title={t('filters.title')}
+            showReset={false}
+            showApply={false}
+          />
           <View style={styles.searchContainer}>
             <SearchInput
               value={searchTerm}
               onChangeText={setSearchTerm}
-              placeholder="Search..."
+              placeholder={t('filters.search')}
               autoFocus={false}
             />
           </View>
         </View>
-
         <TabButton
           options={['My Feed', 'All']}
           selectedIndex={selectedIndex}
@@ -158,44 +195,6 @@ const BrowseTask = () => {
             />
           )}
         </View>
-        <Modal
-          visible={filterModalVisible}
-          transparent
-          animationType="fade"
-          onRequestClose={() => setFilterModalVisible(false)}
-        >
-          <Pressable
-            style={styles.modalOverlay}
-            onPress={() => setFilterModalVisible(false)}
-          >
-            <View style={styles.modalContent}>
-              <Text style={styles.modalTitle}>Sort by Status</Text>
-              {[
-                { key: 'newest', value: 'newest' },
-                { key: 'oldest', value: 'oldest' },
-              ].map(option => (
-                <TouchableOpacity
-                  key={option.key}
-                  style={[
-                    styles.modalOption,
-                    selectedStatus === option.key && styles.modalOptionSelected,
-                  ]}
-                  onPress={() => setSelectedStatus(option.value)}
-                >
-                  <Text
-                    style={
-                      selectedStatus === option.value
-                        ? styles.modalOptionTextSelected
-                        : styles.modalOptionText
-                    }
-                  >
-                    {option.key}
-                  </Text>
-                </TouchableOpacity>
-              ))}
-            </View>
-          </Pressable>
-        </Modal>
       </SafeAreaView>
     </SafeAreaProvider>
   );

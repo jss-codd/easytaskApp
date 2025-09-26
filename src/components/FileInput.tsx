@@ -17,7 +17,7 @@ const FileInput = ({
   value = [],
   onSelectFile,
   placeholder,
-  allowMultiSelection = true, // 👈 default multiple
+  allowMultiSelection = true, 
 }: any) => {
   const [previewUri, setPreviewUri] = useState<string | null>(null);
 
@@ -42,10 +42,10 @@ const FileInput = ({
         }));
 
         if (allowMultiSelection) {
-          // ✅ merge with existing files
+         
           onSelectFile([...(Array.isArray(value) ? value : []), ...newFiles]);
         } else {
-          // ✅ replace for single file
+         
           onSelectFile(newFiles[0]);
         }
       }
@@ -65,7 +65,6 @@ const FileInput = ({
     }
   };
 
-  // ✅ render preview (image or document)
   const renderFilePreview = (file: any, index: number) => {
     const isImage = file.type?.startsWith('image/');
     return (
@@ -92,7 +91,6 @@ const FileInput = ({
          
             <Text style={{ fontSize: 10, textAlign: 'center' }}>
               <Image source={{ uri: ImageUrl+file}} style={{ width: 70, height: 70 ,borderRadius: 8,  marginBottom: 5,}} />
-              {/* {file.name?.slice(0, 10)}… */}
             </Text>
          
         )}
@@ -105,7 +103,6 @@ const FileInput = ({
             paddingHorizontal: 8,
             borderRadius: 6,
             marginTop: 5,
-            // marginBottom: 5,
           }}
         >
           <Text style={{ color: '#fff', fontSize: metrics.fontSize(10) }}>
@@ -119,8 +116,6 @@ const FileInput = ({
   return (
     <View style={{ marginVertical: metrics.marginVertical(10) }}>
       <Text style={{ marginBottom: metrics.marginBottom(5) }}>{label}</Text>
-
-      {/* Upload Button */}
       <TouchableOpacity
         onPress={handlePick}
         style={{
@@ -139,7 +134,6 @@ const FileInput = ({
         </Text>
       </TouchableOpacity>
 
-      {/* Previews */}
       {allowMultiSelection ? (
         Array.isArray(value) && value.length > 0 ? (
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -152,7 +146,6 @@ const FileInput = ({
         renderFilePreview(value, 0)
       ) : null}
 
-      {/* Fullscreen Image Preview */}
       <Modal visible={!!previewUri} transparent={true}>
         <View
           style={{
@@ -187,86 +180,3 @@ export default FileInput;
 
 
 
-// import React from 'react';
-// import { View, Text, TouchableOpacity } from 'react-native';
-// import { pick } from '@react-native-documents/picker';
-// import metrics from '../constants/metrics';
-// import Colors from '../constants/color';
-
-// const FileInput = ({ label, value, onSelectFile, placeholder }: any) => {
-//   const handlePick = async () => {
-//     try {
-//       const result = await pick({
-//         allowMultiSelection: false,
-//         type: [
-//           'image/*',
-//           'application/pdf',
-//           'application/msword',
-//           'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-//         ],
-//       });
-
-//       if (result && result.length > 0) {
-//         const file = result[0];
-//         console.log(file);
-//         onSelectFile({
-//           uri: file.uri,
-//           name: file.name,
-//           type: file.type,
-//           size: file.size,
-//         });
-//       }
-//     } catch (error) {
-//       console.warn('File picking failed:', error);
-//     }
-//   };
-
-//   const handleRemoveFile = () => {
-//     onSelectFile(null); // Clear the file
-//   };
-
-//   return (
-//     <View style={{ marginVertical: metrics.marginVertical(10) }}>
-//       <Text style={{ marginBottom: metrics.marginBottom(5) }}>{label}</Text>
-
-//       <TouchableOpacity
-//         onPress={handlePick}
-//         style={{
-//           padding: metrics.padding(12),
-//           backgroundColor: Colors.WHITE,
-//           borderRadius: metrics.borderRadius(8),
-//           marginBottom: metrics.marginBottom(2),
-//           // height: metrics.height(40),
-//         }}
-//       >
-//         <Text
-//           style={{
-//             fontSize: metrics.fontSize(12),
-//             justifyContent: 'center',
-//             alignItems: 'center',
-//           }}
-//         >
-//           {value?.name || `Upload ${placeholder}`}
-//         </Text>
-//       </TouchableOpacity>
-
-//       {value?.name && (
-//         <TouchableOpacity
-//           onPress={handleRemoveFile}
-//           style={{
-//             padding: metrics.padding(10),
-//             backgroundColor: '#f66',
-//             borderRadius: metrics.borderRadius(8),
-//             alignItems: 'center',
-//           }}
-//         >
-//           <Text style={{ color: '#fff', fontSize: metrics.fontSize(12) }}>
-//             Remove file
-//           </Text>
-//         </TouchableOpacity>
-//       )}
-//     </View>
-//   );
-// };
-
-// export default FileInput;

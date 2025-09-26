@@ -20,11 +20,16 @@ import { useFocusEffect, useNavigation, useRoute } from '@react-navigation/nativ
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import Toast from 'react-native-toast-message';
 import CategorySelectionForm from './taskForms/CategorySelectionForm';
+import { useTranslation } from 'react-i18next';
 
 const StepperForm = () => {
   const [step, setStep] = useState(0);
-  const navigation = useNavigation<any>();
+  const [loading, setLoading] = useState(false);
+
+  const { t } = useTranslation();
   const formRef = useRef<FormikProps<any>>(null);
+  
+  const navigation = useNavigation<any>();
   const route = useRoute();
   const { bid } = (route.params as { bid?: any }) || {};
   const isEditMode = !!bid;
@@ -35,7 +40,12 @@ const StepperForm = () => {
       description: bid.description || '',
       estimateBudget: Number(bid.estimateBudget) || 0,
       selectedCategories: bid.selectedCategories || [],
-      mainCategory: bid.mainCategory || '',
+      mainCategory: (bid.selectedCategories || []).map((cat: any) => String(cat.id)),
+      categories: (bid.selectedCategories || [])
+        .flatMap((cat: any) =>
+          (cat.subCategories || []).map((sub: any) => String(sub.id))
+        ),
+      // mainCategory: bid.mainCategory || '',
       location: bid.location || {},
       media: bid.media || null,
       deadline: bid.deadline ? bid.deadline.split('T')[0] : '',
@@ -63,6 +73,7 @@ const StepperForm = () => {
     handleSubmit: any,
     validateForm: any,
     setFieldTouched: any,
+    loading?: boolean,
   ) => {
     const navigationProps = {
       step,
@@ -70,6 +81,7 @@ const StepperForm = () => {
       handleSubmit,
       validateForm,
       setFieldTouched,
+      loading,
     };
 
     switch (step) {
@@ -102,7 +114,7 @@ const StepperForm = () => {
           />
         );
       case 4:
-        return <Preview values={values} setStep={setStep} handleSubmit={handleSubmit} />;
+        return <Preview values={values} setStep={setStep} handleSubmit={handleSubmit} loading={loading} />;
 
       default:
         return null;
@@ -113,6 +125,7 @@ const StepperForm = () => {
     values: TaskPayload,
     resetForm: () => void,
   ) => {
+    setLoading(true);
     const formData = new FormData();
 
     formData.append('title', values.title);
@@ -133,11 +146,18 @@ const StepperForm = () => {
 
     if (Array.isArray(values.media) && values.media.length > 0) {
       values.media.forEach((file: any, index: number) => {
-        formData.append('media', {
-          uri: file.uri,
-          type: file.type || 'application/octet-stream',
-          name: file.name || `file_${index}`,
-        } as any);
+        // Case 1: Already uploaded image (string URL)
+        if (typeof file === 'string') {
+          formData.append('media', file); 
+        } 
+        // Case 2: New image picked (object with uri)
+        else if (file?.uri) {
+          formData.append('media', {
+            uri: file.uri,
+            type: file.type || 'application/octet-stream',
+            name: file.name || `file_${index}`,
+          } as any);
+        }
       });
     }
 
@@ -154,17 +174,13 @@ const StepperForm = () => {
       resetForm();
       setStep(0);
     } catch (error: any) {
-      console.error(
-        'Error submitting task:',
-        error.response?.data || error.message,
-      );
-
       Toast.show({
         type: 'error',
         text1: 'Error',
         text2: error.response?.data?.message || 'Something went wrong',
       });
     }
+    setLoading(false);
   };
 
   return (
@@ -194,9 +210,10 @@ const StepperForm = () => {
                 setFieldValue,
                 validateForm,
                 setFieldTouched,
+               
               }) => (
                 <>
-                  <Header title={isEditMode ? 'Edit Task' : 'Post Task'} showBack={true} />
+                  <Header title={isEditMode ?   t('navigation.editTask') : t('navigation.postTask')} showBack={true} />
                   {renderStep(
                     values,
                     handleChange,
@@ -206,6 +223,7 @@ const StepperForm = () => {
                     handleSubmit,
                     validateForm,
                     setFieldTouched,
+                    loading,
                   )}
                 </>
               )}
