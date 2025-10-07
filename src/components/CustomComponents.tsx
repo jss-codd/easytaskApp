@@ -1,8 +1,7 @@
-import { StyleSheet, Text, TouchableOpacity, View, Modal, TextInput, Dimensions } from 'react-native';
+import { Text, TouchableOpacity, View } from 'react-native';
 import styles from '../screens/task/bidDetails';
 import Colors from '../constants/color';
 import { LinearGradient } from 'react-native-linear-gradient';
-import metrics from '../constants/metrics';
 
 export const InfoRow = ({
   label,
@@ -43,6 +42,13 @@ export const VerifiedBadge = () => (
   <View style={styles.verifiedRow}>
     <Text style={styles.verifiedIcon}>✔</Text>
     <Text style={styles.verifiedText}>Payment Verified</Text>
+  </View>
+);
+
+export const NotVerifiedBadge = () => (
+  <View style={styles.verifiedRow}>
+    {/* <Text style={styles.notVerifiedIcon}>×</Text> */}
+    <Text style={styles.notVerifiedText}>Payment Not Verified</Text>
   </View>
 );
 

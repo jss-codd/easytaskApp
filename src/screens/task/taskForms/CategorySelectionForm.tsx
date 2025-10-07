@@ -199,7 +199,7 @@ const CategorySelectionForm = ({
 
                                     {isExpanded && category.subcategories && category.subcategories.length > 0 && (
                                         <View style={styles.subcategoriesContainer}>
-                                            <Text style={styles.subcategoriesTitle}>{t('task.subCategories')}</Text>
+                                            <Text style={styles.subcategoriesTitle}>{t('task.subCategory')}</Text>
                                             {category.subcategories?.map((subcategory) => {
                                                 const isSubcategorySelected = selectedSubcategories.has(subcategory.id);
                                                 const isCategorySelected = selectedCategories.has(category.id);

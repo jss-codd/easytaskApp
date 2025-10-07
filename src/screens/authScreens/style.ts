@@ -15,6 +15,17 @@ export const loginStyles = StyleSheet.create({
     paddingVertical: metrics.padding(40),
     justifyContent: 'center',
   },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: metrics.margin(16),
+  },
+  logo: {
+    width: metrics.width(140),
+    height: metrics.width(140),
+    alignSelf: 'center',
+    // marginBottom: metrics.margin(16),
+    resizeMode: 'contain',
+  },
   loginButton: {
     marginTop: metrics.marginTop(15),
     backgroundColor:Colors.BUTTON_BACKGROUND,

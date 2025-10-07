@@ -10,6 +10,9 @@ import { saveFcmToken } from './src/service/apiService';
 import { initNotifications } from './src/service/notificationHelper';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import i18n from './src/service/i18n';
+import Geocoder from 'react-native-geocoding';
+
+Geocoder.init('AIzaSyB38d-7W8gKUE6z_i4mUQYRZgKz4qHtH8A', { language: 'en' }); 
 
 function AppWrapper() {
   const [fcmToken, setFcmToken] = useState<string | null>(null);

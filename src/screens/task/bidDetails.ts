@@ -54,7 +54,18 @@ const styles = StyleSheet.create({
   verifiedText: {
     color: Colors.SUCCESS_GREEN,
     marginLeft: metrics.marginLeft(5),
+    fontSize: metrics.fontSize(10),
+    fontWeight: '500',
+  },
+  notVerifiedIcon: {
+    color: Colors.RED_ERROR,
+    fontWeight: 'medium',
     fontSize: metrics.fontSize(12),
+  },
+  notVerifiedText: {
+    color: Colors.RED_ERROR,
+    marginLeft: metrics.marginLeft(5),
+    fontSize: metrics.fontSize(10),
     fontWeight: '500',
   },
   ratingRow: {

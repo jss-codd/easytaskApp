@@ -23,10 +23,11 @@ export const fetchTasks = createAsyncThunk<
     search?: string;
     categories?: string;
     fixedPrice?: string;
+    sortByTime?: string;
   }
->('tasks/fetchTasks', async ({ search, categories = '',fixedPrice = '' }, { rejectWithValue }) => {
+>('tasks/fetchTasks', async ({ search, categories = '',fixedPrice = '', sortByTime = '' }, { rejectWithValue }) => {
   try {
-    const response = await getTasks(search || '', categories || '',fixedPrice || '');
+    const response = await getTasks(search || '', categories || '',fixedPrice || '', sortByTime || '');
     return response;
   } catch (error: any) {
     return rejectWithValue(
@@ -42,10 +43,11 @@ export const fetchBrowseTasks = createAsyncThunk<
     userId?: string;
     categories?: string;
     fixedPrice?: string;
+    sortByTime?: string;
   }
->('tasks/fetchBrowseTasks', async ({ search,userId, categories = '',fixedPrice = '' }, { rejectWithValue }) => {
+>('tasks/fetchBrowseTasks', async ({ search,userId, categories = '',fixedPrice = '', sortByTime = '' }, { rejectWithValue }) => {
   try {
-    const response = await getAllBrowseTasks(search || '',userId || '', categories || '',fixedPrice || '');
+    const response = await getAllBrowseTasks(search || '',userId || '', categories || '',fixedPrice || '', sortByTime || '');
     return response;
   } catch (error: any) {
     return rejectWithValue(

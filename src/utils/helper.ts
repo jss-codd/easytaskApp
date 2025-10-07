@@ -73,20 +73,6 @@ export const stateOptions = [
   { label: 'Ladakh', value: 'Ladakh' },
 ];
 
-export const filterSections = [
-  {
-    id: 'priceRange',
-    title: 'Fixed Price',
-    type: 'single' as const,
-    options: [
-      { id: '1', label: 'Less Than ₹100', value: 'lt-100' },
-      { id: '2', label: '₹100 To ₹500', value: '100-500' },
-      { id: '3', label: '₹500 To ₹1k', value: '500-1000' },
-      { id: '4', label: '₹1k To ₹5k', value: '1000-5000' },
-    ],
-  },
-];
-
 export const formatChatTime = (dateString?: string): string => {
   if (!dateString) return '';
 

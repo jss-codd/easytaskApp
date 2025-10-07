@@ -5,7 +5,7 @@ import LocationIcon from '../../Icons/LocationIcon';
 import { Location, User } from '../../utils/type';
 import metrics from '../../constants/metrics';
 import { UnsaveIcon, SaveIcon } from '../../Icons/SaveIcon';
-import { Chip, Rating, VerifiedBadge } from '../../components/CustomComponents';
+import { Chip, NotVerifiedBadge, Rating, VerifiedBadge } from '../../components/CustomComponents';
 import { getBidRange } from '../../utils/helper';
 import { UserRole } from '../../utils/enums';
 import FONT_FAMILY from '../../constants/FontFamily';
@@ -53,12 +53,16 @@ const JobCard = ({
     <TouchableOpacity style={styles.card} onPress={onViewBids}>
       <View style={[styles.row, { justifyContent: 'space-between' }]}>
         <Text style={styles.postedTime}>{`Posted ${postedTime}`}</Text>
-        {paymentVerified && (
-          <VerifiedBadge />
+        {paymentVerified ? (
+           <NotVerifiedBadge />
+          // <VerifiedBadge />
           // <View style={styles.row}>     
           //   <Text style={styles.verifiedIcon}>✔</Text>
           //   <Text style={styles.verifiedText}> Payment Verified</Text>
           // </View>
+        ) : (
+          <VerifiedBadge />
+          // <NotVerifiedBadge />
         )}
       </View>
 

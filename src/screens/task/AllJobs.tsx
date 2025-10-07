@@ -43,13 +43,24 @@ const AllJobs = () => {
   const filterSections = [
     {
       id: 'priceRange',
-      title: t('filters.fixedPrice'),
+      title: t('filters.sortByPrice'),
       type: 'single' as const,
       options: [
         { id: '1', label: t('filters.lessThan100'), value: 'lt-100' },
         { id: '2', label: t('filters.hundredTo500'), value: '100-500' },
         { id: '3', label: t('filters.fiveHundredTo1k'), value: '500-1000' },
         { id: '4', label: t('filters.oneKTo5k'), value: '1000-5000' },
+      ],
+    },
+    {
+      id: 'sortByTime ',
+      title: t('filters.sortByTime'),
+      type: 'single' as const,
+      options: [
+        { id: '1', label: t('filters.newest'), value: 'newest-first' },
+        { id: '2', label: t('filters.1dayAgo'), value: '1day' },
+        { id: '3', label: t('filters.2daysAgo'), value: '2days' },
+        // { id: '4', label: t('filters.oneKTo5k'), value: '1000-5000' },
       ],
     },
   ];
@@ -60,13 +71,14 @@ const AllJobs = () => {
     dispatch(fetchTasks({
       search: debouncedSearchTerm,
       categories: filters.categories ? filters.categories.join(',') : '',
-      fixedPrice: filters.fixedPrice || ''
+      fixedPrice: filters.fixedPrice || '',
+      sortByTime: filters.sortByTime || ''
     }));
   }, [dispatch, debouncedSearchTerm]);
 
   const handleResetFilters = useCallback(() => {
     setAppliedFilters({});
-    dispatch(fetchTasks({ search: debouncedSearchTerm }));
+    dispatch(fetchTasks({ search: debouncedSearchTerm, sortByTime: '' }));
   }, [dispatch, debouncedSearchTerm]);
 
   const {
@@ -85,7 +97,7 @@ const AllJobs = () => {
 
   useFocusEffect(
     useCallback(() => {
-      dispatch(fetchTasks({ search: debouncedSearchTerm }));
+      dispatch(fetchTasks({ search: debouncedSearchTerm, sortByTime: '' }));
     }, [dispatch, debouncedSearchTerm]),
   );
 

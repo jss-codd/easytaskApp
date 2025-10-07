@@ -69,7 +69,9 @@
       "clearAll": "सभी साफ़ करें",
       "reset": "रीसेट",
       "applyFilters": "फ़िल्टर लागू करें",
-      "subCategories": "उप-श्रेणियां"
+      "subCategories": "उप-श्रेणियां",
+      "1dayAgo": "1 दिन पहले",
+      "2daysAgo": "2 दिन पहले"
     },
    
     "task": {

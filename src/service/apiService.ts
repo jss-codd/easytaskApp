@@ -48,13 +48,13 @@ export const changePassword = async (payload: any) => {
   return response.data;
 };
 
-export const getTasks = async (search: string, categories: string,fixedPrice: string) => {
-  const response = await api.get(`/tasks?search=${search}&categories=${categories}&fixedPrice=${fixedPrice}`);
+export const getTasks = async (search: string, categories: string,fixedPrice: string, sortByTime: string  ) => {
+  const response = await api.get(`/tasks?search=${search}&categories=${categories}&fixedPrice=${fixedPrice}&sortByTime=${sortByTime}`);
   return response.data;
 };
 
-export const getAllBrowseTasks = async (search: string, userId: string, categories: string,fixedPrice: string) => {
-  const response = await api.get(`/tasks/public?search=${search}&userId=${userId}&categories=${categories}&fixedPrice=${fixedPrice}`);
+export const getAllBrowseTasks = async (search: string, userId: string, categories: string,fixedPrice: string, sortByTime: string) => {
+  const response = await api.get(`/tasks/public?search=${search}&userId=${userId}&categories=${categories}&fixedPrice=${fixedPrice}&sortByTime=${sortByTime}`);
   return response.data;
 };
 

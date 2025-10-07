@@ -19,6 +19,7 @@ import { goNextStep, stateOptions } from '../../../utils/helper';
 import Colors from '../../../constants/color';
 import { stepFields } from '../../../utils/type';
 import { useTranslation } from 'react-i18next';
+import MapView, { Marker } from 'react-native-maps';
 
 const AddressDetails = ({
   values,
@@ -32,13 +33,16 @@ const AddressDetails = ({
   setFieldTouched,
 }: any) => {
   const { t } = useTranslation();
-  
+
   const [region, setRegion] = useState({
     latitude: 28.6139,
     longitude: 77.209,
     latitudeDelta: 0.05,
     longitudeDelta: 0.05,
   });
+
+  // console.log(values.location.city);
+  // console.log(region);
 
   useEffect(() => {
     if (values.location.state && values.location.city) {
@@ -130,6 +134,7 @@ const AddressDetails = ({
             }
             placeholder={t('task.city')}
             value={values.location.city}
+            
             onChangeText={handleChange('location.city')}
             error={touched.location?.city && errors.location?.city}
           />
@@ -142,23 +147,23 @@ const AddressDetails = ({
             onSelect={(selectedItem: any, index: number) => {
               setFieldValue('location.state', selectedItem.value);
             }}
-            // onChangeText={handleChange('location.state')}
+            onChangeText={handleChange('location.state')}
             // setFieldValue={setFieldValue}
             error={touched.location?.state && errors.location?.state}
             data={stateOptions}
           />
 
-          {/* <View
-                style={{
-                  height: 200,
-                  marginTop: 20,
-                  borderRadius: metrics.borderRadius(15),
-                  overflow: 'hidden',
-                  borderWidth: 1,
-                  borderColor: Colors.LIGHT_GREY,
-                }}
-              >
-                <MapView
+          <View
+            style={{
+              height: 200,
+              marginTop: 20,
+              borderRadius: metrics.borderRadius(15),
+              overflow: 'hidden',
+              borderWidth: 1,
+              borderColor: Colors.LIGHT_GREY,
+            }}
+          >
+            <MapView
               style={{ flex: 1 }}
               region={region}
               onRegionChangeComplete={setRegion}
@@ -168,9 +173,10 @@ const AddressDetails = ({
                   latitude: region.latitude,
                   longitude: region.longitude,
                 }}
+                title={values.location.city}
               />
             </MapView>
-              </View> */}
+          </View>
           <View style={FormStyles.row}>
             {step > 0 && (
               <TouchableOpacity

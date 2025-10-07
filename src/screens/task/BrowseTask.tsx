@@ -27,7 +27,6 @@ import MenuIcon from '../../Icons/MenuIcon';
 import { Toast } from '../../components/CommonToast';
 import { useFilterDrawer } from '../../hooks/useFilterDrawer';
 import FilterDrawer from '../../components/FilterDrawer';
-import { filterSections } from '../../utils/helper';
 import { useTranslation } from 'react-i18next';
 
 const BrowseTask = () => {
@@ -35,20 +34,46 @@ const BrowseTask = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState('');
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
-  
+
   const { t } = useTranslation();
   const dispatch = useAppDispatch();
   const navigation = useNavigation<NavigationProp<any>>();
   const [appliedFilters, setAppliedFilters] = useState<Record<string, any>>({});
 
+  const filterSections = [
+    {
+      id: 'priceRange',
+      title: t('filters.sortByPrice'),
+      type: 'single' as const,
+      options: [
+        { id: '1', label: t('filters.lessThan100'), value: 'lt-100' },
+        { id: '2', label: t('filters.hundredTo500'), value: '100-500' },
+        { id: '3', label: t('filters.fiveHundredTo1k'), value: '500-1000' },
+        { id: '4', label: t('filters.oneKTo5k'), value: '1000-5000' },
+      ],
+    },
+    {
+      id: 'sortByTime ',
+      title: t('filters.sortByTime'),
+      type: 'single' as const,
+      options: [
+        { id: '1', label: t('filters.newest'), value: 'newest-first' },
+        { id: '2', label: t('filters.1dayAgo'), value: '1day' },
+        { id: '3', label: t('filters.2daysAgo'), value: '2days' },
+        // { id: '4', label: t('filters.oneKTo5k'), value: '1000-5000' },
+      ],
+    },
+  ];
+
   const handleApplyFilters = useCallback((filters: Record<string, any>) => {
 
     setAppliedFilters(filters);
     // Apply filters to the browse task fetch
-    dispatch(fetchBrowseTasks({ 
+    dispatch(fetchBrowseTasks({
       search: debouncedSearchTerm,
       categories: filters.categories ? filters.categories.join(',') : '',
-      fixedPrice: filters.fixedPrice || ''
+      fixedPrice: filters.fixedPrice || '',
+      sortByTime: filters.sortByTime || ''
     }));
   }, [dispatch, debouncedSearchTerm]);
 

@@ -68,7 +68,9 @@
     "clearAll": "Clear All",
     "reset": "Reset",
     "applyFilters": "Apply Filters",
-    "subCategories": "Sub-categories"
+    "subCategories": "Sub-categories",
+    "1dayAgo": "1 Day Ago",
+    "2daysAgo": "2 Days Ago"
   },
   "task": {
     "title": "Task",

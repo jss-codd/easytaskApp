@@ -15,8 +15,10 @@ import styles from './bidDetails';
 import {
   Chip,
   InfoRow,
+  NotVerifiedBadge,
   Rating,
   Section,
+  VerifiedBadge,
 } from '../../components/CustomComponents';
 import LocationIcon from '../../Icons/LocationIcon';
 import Colors from '../../constants/color';
@@ -116,10 +118,11 @@ const BidDetails = () => {
                 </View>
               </View>
               <Rating stars={task?.owner?.profile.rating || 0} />
-              <View style={styles.verifiedRow}>
+              {task?.owner?.profile?.paymentVerified ? <VerifiedBadge /> : <NotVerifiedBadge />}
+              {/* <View style={styles.verifiedRow}>
                 <Text style={styles.verifiedIcon}>✔</Text>
                 <Text style={styles.verifiedText}>Payment verified</Text>
-              </View>
+              </View> */}
 
               <View style={styles.locationRow}>
                 <LocationIcon size={15} color={Colors.DARK_GREY} />

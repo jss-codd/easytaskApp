@@ -10,6 +10,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   StatusBar,
+  Image,
 } from 'react-native';
 import { Formik, FormikProps } from 'formik';
 import CustomTextInput from '../../components/CustomTextInput';
@@ -24,6 +25,7 @@ import Toast from 'react-native-toast-message';
 import CustomPasswordInput from '../../components/CustomPasswordInput';
 import Colors from '../../constants/color';
 import { useTranslation } from 'react-i18next';
+import Logo from '../../assets/logo.png';
 
 const Login = () => {
   const navigation = useNavigation<NavigationProp<any>>();
@@ -79,6 +81,7 @@ const Login = () => {
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={loginStyles.formContainer}>
             <StatusBar backgroundColor={Colors.MAIN_COLOR} barStyle="dark-content" />
+            <Image source={Logo} style={loginStyles.logo} />
             <Text style={loginStyles.title}>{t('auth.loginYourAccount')}</Text>
             <Formik
               innerRef={formRef}

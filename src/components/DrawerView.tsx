@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { Alert, StyleSheet, Text, View, TouchableOpacity } from 'react-native';
+import { Alert, StyleSheet, Text, View, TouchableOpacity, Image } from 'react-native';
 import {
   DrawerContentComponentProps,
   DrawerContentScrollView,
@@ -48,7 +48,7 @@ const Loader = ({
 
 const DrawerView = (props: DrawerContentComponentProps) => {
   const [loading, setLoading] = useState(false);
-  
+
   const { state } = props;
   const activeRoute = state.routeNames[state.index];
   const { t } = useTranslation();
@@ -88,15 +88,15 @@ const DrawerView = (props: DrawerContentComponentProps) => {
           <Text style={styles.closeText}>✕</Text>
         </TouchableOpacity> */}
         <View style={styles.userInfo}>
-          {/* <View style={styles.appIconContainer}>
-            <Text style={styles.appIcon}>📱</Text>
-          </View> */}
-          <Text style={styles.nameText} numberOfLines={1}>
+          <View style={styles.appIconContainer}>
+            <Image source={require('../assets/logo.png')} style={styles.appIcon} />
+          </View>
+          {/* <Text style={styles.nameText} numberOfLines={1}>
             Easy Task
           </Text>
           <Text style={styles.subtitleText}>
             Task Management App
-          </Text>
+          </Text> */}
         </View>
       </View>
 
@@ -110,7 +110,7 @@ const DrawerView = (props: DrawerContentComponentProps) => {
             onPress={() => props.navigation.navigate(Screen.Categories)}
           >
             <View style={styles.menuItemContent}>
-              <Text style={styles.menuIcon}><SaveIcon color={Colors.GREY}/></Text>
+              <Text style={styles.menuIcon}><SaveIcon color={Colors.GREY} /></Text>
               <Text style={[
                 styles.menuLabel,
                 isActive('Categories') && styles.activeMenuLabel
@@ -120,7 +120,7 @@ const DrawerView = (props: DrawerContentComponentProps) => {
             </View>
           </TouchableOpacity>
         ) : null}
-        
+
         <TouchableOpacity
           style={[
             styles.menuItem,
@@ -129,7 +129,7 @@ const DrawerView = (props: DrawerContentComponentProps) => {
           onPress={() => props.navigation.navigate(Screen.UpdateProfile)}
         >
           <View style={styles.menuItemContent}>
-            <Text style={styles.menuIcon}><UserIcon size={20} color={Colors.GREY}/></Text>
+            <Text style={styles.menuIcon}><UserIcon size={20} color={Colors.GREY} /></Text>
             <Text style={[
               styles.menuLabel,
               isActive('UpdateProfile') && styles.activeMenuLabel
@@ -147,7 +147,7 @@ const DrawerView = (props: DrawerContentComponentProps) => {
           onPress={() => props.navigation.navigate(Screen.SavedTask)}
         >
           <View style={styles.menuItemContent}>
-            <Text style={styles.menuIcon}><JobIcon size={20} color={Colors.GREY}/></Text>
+            <Text style={styles.menuIcon}><JobIcon size={20} color={Colors.GREY} /></Text>
             <Text style={[
               styles.menuLabel,
               isActive('SavedTask') && styles.activeMenuLabel
@@ -165,7 +165,7 @@ const DrawerView = (props: DrawerContentComponentProps) => {
           onPress={() => props.navigation.navigate(Screen.ChangePassword)}
         >
           <View style={styles.menuItemContent}>
-            <Text style={styles.menuIcon}><EyeIcon.EyeIcon color={Colors.GREY}/></Text>
+            <Text style={styles.menuIcon}><EyeIcon.EyeIcon color={Colors.GREY} /></Text>
             <Text style={[
               styles.menuLabel,
               isActive('ChangePassword') && styles.activeMenuLabel
@@ -183,7 +183,7 @@ const DrawerView = (props: DrawerContentComponentProps) => {
           onPress={() => props.navigation.navigate(Screen.Wallet)}
         >
           <View style={styles.menuItemContent}>
-            <Text style={styles.menuIcon}><WalletIcon color={Colors.GREY}/></Text>
+            <Text style={styles.menuIcon}><WalletIcon color={Colors.GREY} /></Text>
             <Text style={[
               styles.menuLabel,
               isActive('Wallet') && styles.activeMenuLabel
@@ -198,7 +198,7 @@ const DrawerView = (props: DrawerContentComponentProps) => {
       <View style={styles.logoutSection}>
         <View style={styles.divider} />
         <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutIcon}><LogoutIcon color='#fff'/></Text>
+          <Text style={styles.logoutIcon}><LogoutIcon color='#fff' /></Text>
           <Text style={styles.logoutText}>{t('auth.logout')}</Text>
         </TouchableOpacity>
       </View>
@@ -215,8 +215,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: metrics.margin(20),
     paddingHorizontal: metrics.paddingHorizontal(20),
-    paddingBottom: metrics.paddingBottom(20),
-    backgroundColor: Colors.MAIN_COLOR,
+    // paddingBottom: metrics.paddingBottom(20),
+    backgroundColor: Colors.BUTTON_BACKGROUND,
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
     shadowColor: '#000',
@@ -233,16 +233,19 @@ const styles = StyleSheet.create({
     marginTop: metrics.margin(15),
   },
   appIconContainer: {
-    width: 60,
-    height: 60,
-    borderRadius: 30,
-    backgroundColor: 'rgba(255, 255, 255, 0.2)',
+    width: 150,
+    height: 100,
+    borderRadius: 50,
+    // backgroundColor: 'white',
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: metrics.marginBottom(10),
+    padding: metrics.padding(5),
   },
   appIcon: {
-    fontSize: 30,
+    width: '100%',
+    height: '100%',
+    // borderRadius: 50,
   },
   nameText: {
     fontSize: metrics.fontSize(20),
@@ -313,7 +316,7 @@ const styles = StyleSheet.create({
   menuIcon: {
     fontSize: metrics.fontSize(14),
     marginRight: metrics.marginRight(15),
-    color:Colors.GREY
+    color: Colors.GREY
   },
   menuLabel: {
     fontSize: metrics.fontSize(14),
