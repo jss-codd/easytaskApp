@@ -14,6 +14,7 @@ export const verifyEmail = async (payload: any) => {
   const response = await api.post('/auth/verify', payload);
   return response.data;
 };
+
 export const resendVerification = async (payload: any) => {
   const response = await api.post('/auth/resend-verification', payload);
   return response.data;
@@ -203,5 +204,20 @@ export const addWalletBalance = async (payload: any) => {
 
 export const releasePayment = async (taskId: string) => {
   const response = await api.post(`/wallet/release-task/${taskId}`);
+  return response.data;
+};
+
+export const writeReview = async ( payload: any) => {
+  const response = await api.post(`tasks/create-feedback`, payload);
+  return response.data;
+};
+
+export const createDispute = async (payload: any) => {
+  const response = await api.post(`wallet/dispute`, payload);
+  return response.data;
+};
+
+export const createJustification = async (disputes_id: string, payload: any) => {
+  const response = await api.post(`wallet/disputes/${disputes_id}/justification`, payload);
   return response.data;
 };

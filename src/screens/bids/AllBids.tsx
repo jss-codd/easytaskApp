@@ -9,26 +9,32 @@ import Loader from '../../components/Loader';
 import Colors from '../../constants/color';
 import { AxiosErrorMessage, Bid } from '../../utils/type';
 import { useFocusEffect, useNavigation } from '@react-navigation/native';
-import { closeJob, createChat, releasePayment, withdrawContract } from '../../service/apiService';
+import { closeJob, createChat, createDispute, releasePayment, withdrawContract, writeReview } from '../../service/apiService';
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
-import { ContractStatus } from '../../utils/enums';
+import { ContractStatus, PaymentStatus, UserRole } from '../../utils/enums';
 import { Toast } from '../../components/CommonToast';
 import ConfirmationModal from '../../components/ConfirmationModal';
 import { useTranslation } from 'react-i18next';
 import metrics from '../../constants/metrics';
+import { CustomModal } from '../../components/CustomModal';
+import { Rating } from '../../components/CustomComponents';
+import { Rate } from '../../components/Rate';
 
 const AllBids = () => {
   const dispatch = useAppDispatch();
   const navigation = useNavigation<any>();
   const { t } = useTranslation();
 
-  const [payReleased, setPayReleased] = useState(false);  
+  const [payReleased, setPayReleased] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const [confirmConfig, setConfirmConfig] = useState({
     message: "",
     onConfirm: () => { },
   });
-
+  const [showReview, setShowReview] = useState(false);
+  const [review, setReview] = useState('');
+  const [rating, setRating] = useState(0);
+  const [item, setItem] = useState<any>(null);
   const { user } = useAppSelector(state => state.authReducer);
   const { myBids, loading, error } = useAppSelector(
     state => state.myBidReducer,
@@ -150,6 +156,84 @@ const AllBids = () => {
     }
   };
 
+  const handleCreateDispute = async (item: any) => {
+    setShowConfirm(true);
+    setConfirmConfig({
+      message: 'Are you sure you want to create a dispute?',
+      onConfirm: () => handleCreateDisputeApi(item),
+    });
+  };
+
+  const handleCreateDisputeApi = async (item: any) => {
+    const payload = {
+      contractId: item.contractDetails.id,
+      reason: 'Work is not proper completed by tasker',
+      details: 'Work is not proper completed by tasker',
+    };
+    try {
+      const response = await createDispute(payload);
+      if (response.success) {
+        Toast.show({
+          type: 'success',
+          text1: 'Dispute created successfully',
+        });
+        setShowConfirm(false);
+      }
+      else {
+        Toast.show({
+          type: 'error',
+          text1: 'Error creating dispute',
+          text2: (response.error as AxiosErrorMessage).response?.data?.message as string,
+        });
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error creating dispute',
+        text2: (error as AxiosErrorMessage).response?.data?.message as string,
+      });
+    }
+  };
+
+  const handleReview = async (item: any) => {
+    console.log('Review', item);
+    setShowReview(true);
+    setItem(item);
+  };
+
+  const handleReviewApi = async (item: any) => {
+    console.log('Review', review, rating, item?.userId, item?.taskId, user.role);
+    try {
+      const response = await writeReview({
+        userId: item?.userId,
+        taskId: item.taskId,
+        reviewTo: user.role === UserRole.Poster ? UserRole.Tasker : UserRole.Poster,
+        review: review,
+        rating: rating,
+      });
+      if (response) {
+        Toast.show({
+          type: 'success',
+          text1: 'Review created successfully',
+        });
+        setShowReview(false);
+        setItem(null);
+        setReview('');
+        setRating(0);
+      }
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error creating review',
+        text2: (error as AxiosErrorMessage).response?.data?.message as string,
+      });
+      setShowReview(false);
+      setItem(null);
+      setReview('');
+      setRating(0);
+    }
+  };
+
   const renderItem = ({ item }: { item: Bid }) => {
     const { label, backgroundColor, disabled, onPress } = getContractButton(
       item.contractStatus as ContractStatus | null,
@@ -157,7 +241,8 @@ const AllBids = () => {
       handleCreateContract,
       handleWithdraw,
       handleCloseJob,
-      handleReleasePayment
+      handleReleasePayment,
+      handleReview
     );
     return (
       <View style={styles.card}>
@@ -196,12 +281,7 @@ const AllBids = () => {
           Expected Completion: {item.offeredEstimatedTime}h
         </Text>
         <View style={styles.footerRow}>
-          <TouchableOpacity
-            style={styles.footerButton}
-            onPress={() => handleCreateChat(item)}
-          >
-            <Text style={styles.footerBtnText}>Chat</Text>
-          </TouchableOpacity>
+
           <TouchableOpacity
             style={[styles.footerButton, disabled ? { backgroundColor: Colors.LIGHT_GREY } : { backgroundColor: backgroundColor }]}
             onPress={onPress}
@@ -209,15 +289,21 @@ const AllBids = () => {
           >
             <Text style={styles.footerBtnText}>{label}</Text>
           </TouchableOpacity>
-          {item.contractStatus === ContractStatus.COMPLETED && (
+          {item.contractStatus === ContractStatus.COMPLETED && item.task.paymentStatus !== PaymentStatus.PAID && (
             <TouchableOpacity
               style={[styles.footerButton, disabled ? { backgroundColor: Colors.LIGHT_GREY } : { backgroundColor: backgroundColor }]}
-              // onPress={onPress}
-              // disabled={disabled}
+              onPress={() => handleCreateDispute(item)}
+            // disabled={disabled}
             >
               <Text style={styles.footerBtnText}>Dispute</Text>
             </TouchableOpacity>
           )}
+          <TouchableOpacity
+            style={styles.footerButton}
+            onPress={() => handleCreateChat(item)}
+          >
+            <Text style={styles.footerBtnText}>Chat</Text>
+          </TouchableOpacity>
         </View>
       </View>
     );
@@ -225,7 +311,7 @@ const AllBids = () => {
   return (
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1 }}>
-        <Header title={t('bid.allBids')}  />
+        <Header title={t('bid.allBids')} />
         <View style={{ flex: 1, padding: metrics.padding(10), backgroundColor: Colors.BACKGROUND }}>
           {loading ? (
             <Loader fullScreen={true} color={Colors.MAIN_COLOR} />
@@ -253,6 +339,23 @@ const AllBids = () => {
         message={confirmConfig.message}
         onCancel={() => setShowConfirm(false)}
         onConfirm={confirmConfig.onConfirm}
+      />
+      <CustomModal
+        children={
+          <Rate
+            initialRating={rating}
+            onRatingChange={setRating}
+          // onClose={() => setShowReview(false)}
+          />
+        }
+        visible={showReview}
+        onClose={() => setShowReview(false)}
+        type="custom"
+        title="Write Review"
+        placeholder="Write your review here..."
+        value={review}
+        onChangeText={setReview}
+        onAccept={() => handleReviewApi(item)}
       />
     </SafeAreaProvider>
   );

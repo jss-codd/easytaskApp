@@ -247,7 +247,8 @@ export function getContractButton(
   handleCreateContract: (item: any) => void,
   handleWithdraw: (item: any) => void,
   handleCloseJob: (item: any) => void,
-  handleReleasePayment: (item: any) => void
+  handleReleasePayment: (item: any) => void,
+  handleReview: (item: any) => void
 ) {
   switch (status) {
     case null:
@@ -294,14 +295,36 @@ export function getContractButton(
         disableColor: Colors.LIGHT_GREY,
         // onPress: () => {},
       };
-    case ContractStatus.COMPLETED:
-      return {
-        label: "Release Payment",
-        backgroundColor: Colors.SUCCESS_GREEN,
-        disabled: false,
-        disableColor: Colors.LIGHT_GREY,
-        onPress: () => handleReleasePayment(item),
-      };
+    // case ContractStatus.COMPLETED:
+    //   return {
+    //     label: "Release Payment",
+    //     backgroundColor: Colors.SUCCESS_GREEN,
+    //     disabled: false,
+    //     disableColor: Colors.LIGHT_GREY,
+    //     onPress: () => handleReleasePayment(item),
+    //   };
+    case ContractStatus.COMPLETED: {
+      if (item.task.paymentStatus === 'PAID') {
+        // console.log('Write Review', item);
+        return {
+          label: "Review",
+          backgroundColor: Colors.SUCCESS_GREEN,
+          disabled: false,
+          disableColor: Colors.LIGHT_GREY,
+          onPress: () => handleReview(item),
+        };
+      }
+      else {
+        return {
+          label: "Release Payment",
+          backgroundColor: Colors.SUCCESS_GREEN,
+          disabled: false,
+          disableColor: Colors.LIGHT_GREY,
+          onPress: () => handleReleasePayment(item),
+        };
+      }
+    }
+
     default:
       return {
         label: "Unknown",

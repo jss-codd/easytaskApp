@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { FlatList, Image, TouchableOpacity, View } from 'react-native';
 import { Text } from 'react-native';
-import { acceptContract, getTaskerBids, rejectContract } from '../../service/apiService';
+import { acceptContract, getTaskerBids, rejectContract, writeReview } from '../../service/apiService';
 import { useAppSelector } from '../../store/store';
 import Header from '../layout/Header';
 import Loader from '../../components/Loader';
@@ -17,7 +17,8 @@ import { CustomModal } from '../../components/CustomModal';
 import { Toast } from '../../components/CommonToast';
 import { AxiosErrorMessage } from '../../utils/type';
 import { useTranslation } from 'react-i18next';
-
+import { UserRole } from '../../utils/enums';
+import { Rate } from '../../components/Rate';
 
 const MyBids = () => {
   const [bids, setBids] = useState<any[]>([]);
@@ -30,7 +31,10 @@ const MyBids = () => {
   const [showReject, setShowReject] = useState(false);
   const [reason, setReason] = useState('');
   const [contractSummary, setContractSummary] = useState<any>(null);
-
+  const [showReview, setShowReview] = useState(false);
+  const [review, setReview] = useState('');
+  const [rating, setRating] = useState(0);
+  const [item, setItem] = useState<any>(null);
   const { user } = useAppSelector((state: any) => state.authReducer);
   const navigation = useNavigation<any>()
   const { t } = useTranslation();
@@ -91,7 +95,44 @@ const MyBids = () => {
         text2: (error as AxiosErrorMessage).response?.data?.message as string,
       });
     }
-   
+  }
+
+  const handleReview = async (item: any) => {
+    setShowReview(true);
+    setItem(item);
+  };
+
+  const handleReviewApi = async (item: any) => {
+    console.log('Review', review, rating, item?.userId, item?.taskId, user.role);
+    try {
+      const response = await writeReview({
+        userId: item?.userId,
+        taskId: item.taskId,
+        reviewTo: user.role === UserRole.Poster ? UserRole.Tasker : UserRole.Poster,
+        review: review,
+        rating: rating,
+      });
+      if (response) {
+        Toast.show({
+          type: 'success',
+          text1: 'Review created successfully',
+        });
+      }
+      setShowReview(false);
+      setItem(null);
+      setReview('');
+      setRating(0);
+    } catch (error) {
+      Toast.show({
+        type: 'error',
+        text1: 'Error creating review',
+        text2: (error as AxiosErrorMessage).response?.data?.message as string,
+      });
+      setShowReview(false);
+      setItem(null);
+      setReview('');
+      setRating(0);
+    }
   }
 
   const shouldShowButton = (description: string) => description.length > 100;
@@ -106,7 +147,6 @@ const MyBids = () => {
       setLoading(false);
     }
   };
-
 
   const renderItem = ({ item }: { item: any }) => (
 
@@ -191,6 +231,9 @@ const MyBids = () => {
               if (btn.action === "ongoing") {
                 console.log("Ongoing contract:", item.id);
               }
+              if (btn.action === "review") {
+                handleReview(item);
+              }
             }}
           >
             <Text style={styles.footerBtnText}>{btn.label}</Text>
@@ -250,6 +293,22 @@ const MyBids = () => {
         value={reason}
         onChangeText={setReason}
         onReject={() => handleRejectContract()}
+      />
+      <CustomModal
+        children={
+          <Rate
+            initialRating={rating}
+            onRatingChange={setRating}
+          />
+        }
+        visible={showReview}
+        onClose={() => setShowReview(false)}
+        type="custom"
+        title="Write Review"
+        placeholder="Write your review here..."
+        value={review}
+        onChangeText={setReview}
+        onAccept={() => handleReviewApi(item)}
       />
 
 

@@ -1,5 +1,5 @@
 import { PermissionsAndroid, Platform } from 'react-native';
-import messaging from '@react-native-firebase/messaging';
+import messaging, { onNotificationOpenedApp, onTokenRefresh } from '@react-native-firebase/messaging';
 import notifee, { AndroidImportance } from '@notifee/react-native';
 
 export async function initNotifications(
@@ -10,7 +10,7 @@ export async function initNotifications(
       const granted = await PermissionsAndroid.request(
         PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS,
       );
-
+      console.log(granted);
       if (granted !== PermissionsAndroid.RESULTS.GRANTED) {
         return;
       }
@@ -34,7 +34,12 @@ export async function initNotifications(
     const token = await messaging().getToken();
     onToken(token);
 
-    messaging().onNotificationOpenedApp(remoteMessage => {
+    // messaging().onNotificationOpenedApp(remoteMessage => {
+    //   if (remoteMessage) {
+    //     console.log('Opened from background:', remoteMessage);
+    //   }
+    // });
+    onNotificationOpenedApp(messaging(), remoteMessage => {
       if (remoteMessage) {
         console.log('Opened from background:', remoteMessage);
       }
@@ -47,9 +52,13 @@ export async function initNotifications(
       }
     });
 
-    messaging().onTokenRefresh(newToken => {
+    // messaging().onTokenRefresh(newToken => {
+    //   onToken(newToken);
+    // });
+    onTokenRefresh(messaging(), newToken => {
       onToken(newToken);
     });
+    
   } catch (error) {
     console.error('Notification init error:', error);
   }

@@ -1,4 +1,4 @@
-import { UserRole } from "./enums";
+import { PaymentStatus, UserRole } from "./enums";
 
 export const Screen = {
   Login: 'Login',
@@ -97,7 +97,7 @@ export interface Task {
   note: string;
   media: string[];
   archived: boolean;
-  paymentStatus: 'INITIATED' | 'COMPLETED' | 'FAILED';
+  paymentStatus: PaymentStatus;
   progressStatus: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
   ownerId: string;
   createdAt: string;

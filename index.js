@@ -5,10 +5,17 @@ import 'react-native-gesture-handler';
 import { AppRegistry } from 'react-native';
 import App from './App';
 import { name as appName } from './app.json';
-import messaging from '@react-native-firebase/messaging';
-import notifee from '@notifee/react-native';
+import messaging, { setBackgroundMessageHandler } from '@react-native-firebase/messaging';
+import notifee, { AndroidImportance } from '@notifee/react-native';
 
-messaging().setBackgroundMessageHandler(async remoteMessage => {
+setBackgroundMessageHandler(messaging(), async remoteMessage => {
+
+  await notifee.createChannel({
+    id: 'chat-messages',
+    name: 'Chat Messages',
+    importance: AndroidImportance.HIGH,
+  });
+
   await notifee.displayNotification({
     title: remoteMessage.notification?.title || 'New Message',
     body: remoteMessage.notification?.body || 'You have a new notification',
@@ -17,7 +24,6 @@ messaging().setBackgroundMessageHandler(async remoteMessage => {
       pressAction: { id: 'default' },
     },
   });
-
 });
 
 AppRegistry.registerComponent(appName, () => App);

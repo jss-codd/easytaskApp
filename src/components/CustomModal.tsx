@@ -16,6 +16,7 @@ export interface CustomModalProps {
     onChangeText?: (text: string) => void;
     onAccept?: () => void;
     onReject?: () => void;
+    children?: React.ReactNode;
 }
 
 export const CustomModal = ({
@@ -29,6 +30,7 @@ export const CustomModal = ({
     onChangeText,
     onAccept,
     onReject,
+    children,
 }: CustomModalProps) => {
     const screenWidth = Dimensions.get('window').width;
     const modalWidth = screenWidth * 0.9;
@@ -54,15 +56,19 @@ export const CustomModal = ({
                                 <InfoRow label="Scope" value={contractDetails.scope?.trim() || "N/A"} />
                             </>
                         ) : type === "custom" ? (
-
-                            <TextInput
-                                style={modalStyles.textInput}
-                                placeholder={placeholder}
-                                placeholderTextColor={Colors.GREY}
-                                value={value}
-                                onChangeText={onChangeText}
-                                keyboardType="numeric"
-                            />
+                            <>
+                                <View style={modalStyles.rateContainer}>
+                                    {children}
+                                </View>
+                                <TextInput
+                                    style={modalStyles.textInput}
+                                    placeholder={placeholder}
+                                    placeholderTextColor={Colors.GREY}
+                                    value={value}
+                                    onChangeText={onChangeText}
+                                // keyboardType="numeric"
+                                />
+                            </>
                         ) : (
                             <TextInput
                                 style={modalStyles.textInput}
@@ -149,6 +155,10 @@ const modalStyles = StyleSheet.create({
     },
     inputContainer: {
         padding: metrics.padding(16),
+    },
+    rateContainer: {
+        alignItems: 'center',
+        padding: metrics.padding(5),
     },
     textInput: {
         backgroundColor: Colors.BACKGROUND,

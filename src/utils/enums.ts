@@ -11,3 +11,9 @@ export const enum ContractStatus {
   CLOSED = 'CLOSED',
   COMPLETED = 'COMPLETED',
 }
+
+export const enum PaymentStatus {
+  PAID = 'PAID',
+  INITIATED = 'INITIATED',
+  // FAILED = 'FAILED',
+}
